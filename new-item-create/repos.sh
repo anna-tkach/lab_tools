@@ -33,17 +33,16 @@ SCRIPT_DIR="$(dirname "$0")"
 # створення проекта в совю чергу створить овнера при необхідності)
 "$SCRIPT_DIR/project.sh" "$OWNER" "$PROJECT"
 
-# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
+# визначаємо шлях коренової папки _tools для подальшого підключення необхідних файлів.
 TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
 source "$TOOLS_DIR/constants.sh"
+# підключає utils для визначення шляхів
+source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
-# "$(dirname "$0")" — тека, де лежить сам repos.sh
-SCRIPT_DIR="$(dirname "$0")"
-# підключає _utils для визначення шляхів
-source "$SCRIPT_DIR/_utils.sh"
 
-# створюємо необхідні репозиторії (із необхідною структурою) в проекті в овнері в кожній гілці. 
 echo "Створюю структуру для репозиторіїв '$REPOS' (owner: $OWNER, project $PROJECT)."
+# створюємо необхідні репозиторії (із необхідною структурою) в проекті в овнері в кожній гілці.
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
   for REPO in "${REPOS[@]}"; do
     REPO_SUBPATH=$(compute_repo_subpath "$OWNER" "$PROJECT" "$REPO")

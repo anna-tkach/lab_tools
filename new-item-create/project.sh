@@ -29,20 +29,17 @@ SCRIPT_DIR="$(dirname "$0")"
 # Будуємо необхідні директорії для овнера (якщо вони вже є - нічого не зламається, просто не створяться папки)
 "$SCRIPT_DIR/owner.sh" "$OWNER"
 
-# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
+# визначаємо шлях коренової папки _tools для подальшого підключення необхідних файлів.
 TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
 source "$TOOLS_DIR/constants.sh"
+# підключає utils для визначення шляхів
+source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
-# "$(dirname "$0")" — тека, де лежить сам project.sh
-SCRIPT_DIR="$(dirname "$0")"
-# підключає _utils для визначення шляхів
-source "$SCRIPT_DIR/_utils.sh"
-
-PROJECT_SUBPATH=$(compute_project_subpath "$OWNER" "$PROJECT")
-
-echo "Створюю структуру для проєкту '$PROJECT' (owner: $OWNER)"
 
 # створюємо необхідний проект в овнері в кожній гілці.
+echo "Створюю структуру для проєкту '$PROJECT' (owner: $OWNER)"
+PROJECT_SUBPATH=$(compute_project_subpath "$OWNER" "$PROJECT")
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
   PROJECT_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$PROJECT_SUBPATH"
   # TODO - i don't know i this shared directory really needed

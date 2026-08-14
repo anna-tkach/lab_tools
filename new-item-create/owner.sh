@@ -23,21 +23,16 @@ fi
 
 OWNER="$1"
 
-# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
+# визначаємо шлях коренової папки _tools для подальшого підключення необхідних файлів.
 TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
 source "$TOOLS_DIR/constants.sh"
-
-# "$(dirname "$0")" — тека, де лежить сам owner.sh; шлях до підключених
-# файлів будується відносно неї, щоб виклик працював незалежно від того,
-# з якої директорії власне запущено owner.sh
-SCRIPT_DIR="$(dirname "$0")"
-# підключає _utils для визначення шляхів
-source "$SCRIPT_DIR/_utils.sh"
-
-OWNER_SUBPATH=$(compute_owner_subpath "$OWNER")
+# підключає utils для визначення шляхів
+source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
 # створюємо необхідного овнера в кожній гілці.
 echo "Створюю базову структуру для owner '$OWNER'."
+OWNER_SUBPATH=$(compute_owner_subpath "$OWNER")
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
   OWNER_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$OWNER_SUBPATH"
   mkdir -p "$OWNER_DIR"
