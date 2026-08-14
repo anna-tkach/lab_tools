@@ -23,9 +23,7 @@ REPO_ABSOLUTE_PATH="$2"
 
 # "$(dirname "$0")" — тека, де лежить сам new-repo-create.sh, тобто env_runner/
 SCRIPT_DIR="$(dirname "$0")"
-
-# ENV_RUNNER_METHODS — список методів, специфічний саме для env_runner,
-# тому підключається з constants.sh на цьому ж рівні, а не з кореневого
+# підключаємо з constants.sh на цьому ж рівні, там лежать ENV_RUNNER_METHODS
 source "$SCRIPT_DIR/constants.sh"
 
 for METHOD in "${ENV_RUNNER_METHODS[@]}"; do

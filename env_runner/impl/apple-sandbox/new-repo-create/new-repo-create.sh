@@ -13,6 +13,19 @@
 # Використання:
 #   new-repo-create.sh RUNNERS_ABSOLUTE_PATH REPO_ABSOLUTE_PATH
 
+
+
+## include constants
+# get current directory where current script is placed (even if someone other called it from other place).
+SCRIPT_ABSOLUTE_PATH="$(dirname "$0")"
+echo "SCRIPT_ABSOLUTE_PATH = $SCRIPT_ABSOLUTE_PATH"
+# 1. include /env_runner/impl/apple-sandbox/new-repo-create/constants.sh
+# because we need all of them.
+source "$SCRIPT_ABSOLUTE_PATH/constants.sh"
+# 2. include /env_runner/constants.sh
+# because we need apple-sandbox method name from here.
+source "$SCRIPT_ABSOLUTE_PATH/../../../constants.sh"
+
 # functions
 create_file_if_needed() {
   # make sure we have 4 inputs
@@ -30,6 +43,9 @@ create_file_if_needed() {
   # build absolute path to all files inside runners for apple-sandbox env for the repo
   RUNNERS_METHOD_ABSOLUTE_PATH="$RUNNERS_ABSOLUTE_PATH/$METHOD_NAME"
 
+  # make sure RUNNERS_METHOD_ABSOLUTE_PATH exists
+  mkdir -p "$RUNNERS_METHOD_ABSOLUTE_PATH"
+
   # build absolute path to file we are going to create
   FILE_ABSOLUTE_PATH="$RUNNERS_METHOD_ABSOLUTE_PATH/$FILE_NAME"
 
@@ -41,20 +57,31 @@ create_file_if_needed() {
   fi
 
   ## Get template for file we are going to create
-  # get current directory where current script is placed (even if someone other called it from other place).
-  SCRIPT_ABSOLUTE_PATH="$(dirname "$0")"
   # declare directory where templates are placed.
-  TEMPLATES_ABSOLUTE_PATH="$SCRIPT_DIR/templates"
+  TEMPLATES_ABSOLUTE_PATH="$SCRIPT_ABSOLUTE_PATH/templates"
   # build absolute path to the template for the file we are going to create.
   FILE_TEMPLATE_ABSOLUTE_PATH="$TEMPLATES_ABSOLUTE_PATH/$FILE_NAME"
 
   ## build all needed vars to replace them in the template before copying it into the runner of the repo.
   # build absolute paths for permission profile and permission check files inside of this runner (we need this paths for replacing templates with real paths).
   PERMISSION_PROFILE_ABSOLUTE_PATH="$RUNNERS_METHOD_ABSOLUTE_PATH/$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_PROFILE_FILE_NAME"
-  PERMISSION_CHECK_ABSOLUTE_PATH="$RUNNERS_METHOD_ABSOLUTE_PATH/ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_FILE_NAME"
+  PERMISSION_CHECK_ABSOLUTE_PATH="$RUNNERS_METHOD_ABSOLUTE_PATH/$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_FILE_NAME"
   # build absolute path to the main run.sh which must be called by each repo runner.
-  ENV_RUNNER_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+  ENV_RUNNER_DIR="$(cd "$SCRIPT_ABSOLUTE_PATH/../../.." && pwd)"
   MAIN_ENV_RUNNER_ABSOLUTE_PATH="$ENV_RUNNER_DIR/env_runner/run.sh"
+
+
+  echo "DEBUG:"
+  echo "  RUNNERS_ABSOLUTE_PATH                 = [$RUNNERS_ABSOLUTE_PATH]"
+  echo "  REPO_ABSOLUTE_PATH                    = [$REPO_ABSOLUTE_PATH]"
+  echo "  METHOD_NAME                           = [$METHOD_NAME]"
+  echo "  FILE_NAME                             = [$FILE_NAME]"
+  echo "  PERMISSION_PROFILE_ABSOLUTE_PATH      = [$PERMISSION_PROFILE_ABSOLUTE_PATH]"
+  echo "  PERMISSION_CHECK_ABSOLUTE_PATH        = [$PERMISSION_CHECK_ABSOLUTE_PATH]"
+  echo "  ENV_RUNNER_DIR                        = [$ENV_RUNNER_DIR]"
+  echo "  MAIN_ENV_RUNNER_ABSOLUTE_PATH         = [$MAIN_ENV_RUNNER_ABSOLUTE_PATH]"
+  echo "  FILE_TEMPLATE_ABSOLUTE_PATH           = [$FILE_TEMPLATE_ABSOLUTE_PATH]"
+  echo "  ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_ABSOLUTE_PATH         = [$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_ABSOLUTE_PATH]"
 
   ## 1) take template 2) replace vars with values and 3) put built content into creating file.
   sed \
