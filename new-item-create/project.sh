@@ -32,7 +32,7 @@ SCRIPT_DIR="$(dirname "$0")"
 # "$(dirname "$0")" — тека, де лежить сам project.sh
 SCRIPT_DIR="$(dirname "$0")"
 
-# підключає ROOT_DIRECTORY (шлях до кореневої директорії) і TREES (список
+# підключає LAB_ROOT_DIRECTORY (шлях до кореневої директорії) і LAB_ROOT_DIRECTORY_BRANCHES (список
 # паралельних дерев: repos/vault/runners)
 source "$SCRIPT_DIR/_constants.sh"
 
@@ -43,9 +43,10 @@ PROJECT_SUBPATH=$(compute_project_subpath "$OWNER" "$PROJECT")
 
 echo "Створюю структуру для проєкту '$PROJECT' (owner: $OWNER)"
 
-# "${TREES[@]}" перебирає масив repos/vault/runners, визначений в _constants.sh
-for TREE in "${TREES[@]}"; do
-  PROJECT_DIR="$ROOT_DIRECTORY/$TREE/$PROJECT_SUBPATH"
+# "${LAB_ROOT_DIRECTORY_BRANCHES[@]}" перебирає масив repos/vault/runners, визначений в _constants.sh
+for TREE in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
+  PROJECT_DIR="$LAB_ROOT_DIRECTORY/$TREE/$PROJECT_SUBPATH"
+  # TODO - i don't know i this shared directory really needed
   mkdir -p "$PROJECT_DIR/shared"
   echo "  [OK] $PROJECT_DIR/shared"
 done

@@ -28,7 +28,7 @@ OWNER="$1"
 # з якої директорії власне запущено owner.sh
 SCRIPT_DIR="$(dirname "$0")"
 
-# підключає ROOT_DIRECTORY (шлях до кореневої директорії) і TREES (список
+# підключає LAB_ROOT_DIRECTORY (шлях до кореневої директорії) і LAB_ROOT_DIRECTORY_BRANCHES (список
 # паралельних дерев: repos/vault/runners)
 source "$SCRIPT_DIR/_constants.sh"
 
@@ -39,9 +39,9 @@ OWNER_SUBPATH=$(compute_owner_subpath "$OWNER")
 
 echo "Створюю базову структуру для owner '$OWNER'."
 
-# "${TREES[@]}" перебирає масив repos/vault/runners, визначений в _constants.sh,
-for TREE in "${TREES[@]}"; do
-  OWNER_DIR="$ROOT_DIRECTORY/$TREE/$OWNER_SUBPATH"
+# "${LAB_ROOT_DIRECTORY_BRANCHES[@]}" перебирає масив repos/vault/runners, визначений в _constants.sh,
+for TREE in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
+  OWNER_DIR="$LAB_ROOT_DIRECTORY/$TREE/$OWNER_SUBPATH"
   mkdir -p "$OWNER_DIR"
   echo "  [OK] $OWNER_DIR"
 done
