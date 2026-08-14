@@ -1,5 +1,5 @@
 #!/bin/bash
-# _tools/new-item-create/_utils.sh
+# _tools/utils_subpaths_computing.sh
 #
 # Файл не запускається сам по собі — інші скрипти підключають його через "source".
 
