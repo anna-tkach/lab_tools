@@ -43,14 +43,23 @@ source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
 echo "Створюю структуру для репозиторіїв '$REPOS' (owner: $OWNER, project $PROJECT)."
 # створюємо необхідні репозиторії (із необхідною структурою) в проекті в овнері в кожній гілці.
-for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  for REPO in "${REPOS[@]}"; do
-    REPO_SUBPATH=$(compute_repo_subpath "$OWNER" "$PROJECT" "$REPO")
-    echo "REPO_SUBPATH '$REPO_SUBPATH'"
+for REPO in "${REPOS[@]}"; do
+  # 0. for repo build su path
+  REPO_SUBPATH=$(compute_repo_subpath "$OWNER" "$PROJECT" "$REPO")
+  echo "REPO_SUBPATH '$REPO_SUBPATH'"
+
+  # 1. for the repo create structure for all branches
+  for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
     REPO_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$REPO_SUBPATH"
     mkdir -p "$REPO_DIR"
     echo "  [OK] $REPO_DIR"
   done
+
+  # 2. for repo create runner in /runners/ branch
+  RUNNERS_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS/$REPO_SUBPATH"
+  REPO_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/LAB_ROOT_DIRECTORY_BRANCH_REPOS/$REPO_SUBPATH"
+  "$TOOLS_DIR/env_runner/new-repo-create.sh" "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH"
+
 done
 
 echo "Готово. Структура створена для репозиторіїв '$REPOS' (owner: $OWNER, project $PROJECT)."
