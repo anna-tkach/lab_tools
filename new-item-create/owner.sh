@@ -23,25 +23,23 @@ fi
 
 OWNER="$1"
 
+# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
+TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+source "$TOOLS_DIR/constants.sh"
+
 # "$(dirname "$0")" — тека, де лежить сам owner.sh; шлях до підключених
 # файлів будується відносно неї, щоб виклик працював незалежно від того,
 # з якої директорії власне запущено owner.sh
 SCRIPT_DIR="$(dirname "$0")"
-
-# підключає LAB_ROOT_DIRECTORY (шлях до кореневої директорії) і LAB_ROOT_DIRECTORY_BRANCHES (список
-# паралельних дерев: repos/vault/runners)
-source "$SCRIPT_DIR/_constants.sh"
-
 # підключає _utils для визначення шляхів
 source "$SCRIPT_DIR/_utils.sh"
 
 OWNER_SUBPATH=$(compute_owner_subpath "$OWNER")
 
+# створюємо необхідного овнера в кожній гілці.
 echo "Створюю базову структуру для owner '$OWNER'."
-
-# "${LAB_ROOT_DIRECTORY_BRANCHES[@]}" перебирає масив repos/vault/runners, визначений в _constants.sh,
-for TREE in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  OWNER_DIR="$LAB_ROOT_DIRECTORY/$TREE/$OWNER_SUBPATH"
+for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
+  OWNER_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$OWNER_SUBPATH"
   mkdir -p "$OWNER_DIR"
   echo "  [OK] $OWNER_DIR"
 done

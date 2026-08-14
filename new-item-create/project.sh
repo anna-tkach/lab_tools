@@ -29,13 +29,12 @@ SCRIPT_DIR="$(dirname "$0")"
 # Будуємо необхідні директорії для овнера (якщо вони вже є - нічого не зламається, просто не створяться папки)
 "$SCRIPT_DIR/owner.sh" "$OWNER"
 
+# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
+TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+source "$TOOLS_DIR/constants.sh"
+
 # "$(dirname "$0")" — тека, де лежить сам project.sh
 SCRIPT_DIR="$(dirname "$0")"
-
-# підключає LAB_ROOT_DIRECTORY (шлях до кореневої директорії) і LAB_ROOT_DIRECTORY_BRANCHES (список
-# паралельних дерев: repos/vault/runners)
-source "$SCRIPT_DIR/_constants.sh"
-
 # підключає _utils для визначення шляхів
 source "$SCRIPT_DIR/_utils.sh"
 
@@ -43,9 +42,9 @@ PROJECT_SUBPATH=$(compute_project_subpath "$OWNER" "$PROJECT")
 
 echo "Створюю структуру для проєкту '$PROJECT' (owner: $OWNER)"
 
-# "${LAB_ROOT_DIRECTORY_BRANCHES[@]}" перебирає масив repos/vault/runners, визначений в _constants.sh
-for TREE in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  PROJECT_DIR="$LAB_ROOT_DIRECTORY/$TREE/$PROJECT_SUBPATH"
+# створюємо необхідний проект в овнері в кожній гілці.
+for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
+  PROJECT_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$PROJECT_SUBPATH"
   # TODO - i don't know i this shared directory really needed
   mkdir -p "$PROJECT_DIR/shared"
   echo "  [OK] $PROJECT_DIR/shared"

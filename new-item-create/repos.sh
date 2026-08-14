@@ -33,25 +33,22 @@ SCRIPT_DIR="$(dirname "$0")"
 # створення проекта в совю чергу створить овнера при необхідності)
 "$SCRIPT_DIR/project.sh" "$OWNER" "$PROJECT"
 
+# підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
+TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+source "$TOOLS_DIR/constants.sh"
 
 # "$(dirname "$0")" — тека, де лежить сам repos.sh
 SCRIPT_DIR="$(dirname "$0")"
-
-# підключає LAB_ROOT_DIRECTORY (шлях до кореневої директорії) і LAB_ROOT_DIRECTORY_BRANCHES (список
-# паралельних дерев: repos/vault/runners)
-source "$SCRIPT_DIR/_constants.sh"
-
 # підключає _utils для визначення шляхів
 source "$SCRIPT_DIR/_utils.sh"
 
-# "${LAB_ROOT_DIRECTORY_BRANCHES[@]}" перебирає масив repos/vault/runners, визначений в _constants.sh
-# і в кожній створюємо необідну структуру для кожного репо
+# створюємо необхідні репозиторії (із необхідною структурою) в проекті в овнері в кожній гілці. 
 echo "Створюю структуру для репозиторіїв '$REPOS' (owner: $OWNER, project $PROJECT)."
-for TREE in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
+for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
   for REPO in "${REPOS[@]}"; do
     REPO_SUBPATH=$(compute_repo_subpath "$OWNER" "$PROJECT" "$REPO")
     echo "REPO_SUBPATH '$REPO_SUBPATH'"
-    REPO_DIR="$LAB_ROOT_DIRECTORY/$TREE/$REPO_SUBPATH"
+    REPO_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$REPO_SUBPATH"
     mkdir -p "$REPO_DIR"
     echo "  [OK] $REPO_DIR"
   done
