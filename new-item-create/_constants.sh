@@ -7,4 +7,8 @@ ROOT_DIRECTORY=~/lab
 # Список усіх паралельних дерев у кореневій папці — єдине місце, де він визначений;
 # owner.sh, project.sh і repos.sh використовують цей самий список замість
 # трьох окремих захардкоджених копій
-TREES=(repos vault runners)
+TREE_REPOS=repos
+TREE_VAULT=vault
+TREE_RUNNERS=runners
+
+TREES=($TREE_REPOS $TREE_VAULT $TREE_RUNNERS)
