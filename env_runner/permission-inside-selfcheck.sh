@@ -6,15 +6,17 @@
 #   expected: "deny"  — очікуємо, що команда впаде з помилкою (доступ заборонено)
 #             "allow" — очікуємо, що команда виконається успішно (доступ дозволено)
 
+echo "PERMISSION SELF-CHECK - before started."
+
 TESTS_FILE="$1"
-LOG_FILE=~/lab/_tools/runner/permission-selftest/selftest.log
 FAILED=0
 
 # читаємо файл тестів рядок за рядком, розбиваючи кожен рядок по "|" на 3 змінні
 while IFS="|" read -r description command expected; do
+  # пропускаємо порожні рядки та коментарі
+  [[ -z "$description" || "$description" == \#* ]] && continue
 
-  # пропускаємо порожні рядки (наприклад, зайвий порожній рядок в кінці файлу)
-  [ -z "$description" ] && continue
+  echo "Command: $command."
 
   # виконуємо команду з тесту:
   # "> /dev/null" — глушимо звичайний вивід (stdout), він нам не потрібен
@@ -31,7 +33,7 @@ while IFS="|" read -r description command expected; do
     result="deny"
     # логуємо факт помилки одразу тут, незалежно від того, чи це очікувано —
     # бо сам факт помилки і її текст цінні для дебагу в будь-якому випадку
-    echo "[$description] exit $exit_code: $error_output" >> "$LOG_FILE"
+    echo "[$description] exit $exit_code: $error_output"
   else
     result="allow"
   fi
@@ -45,8 +47,10 @@ while IFS="|" read -r description command expected; do
     echo "[FAIL] $description (очікував $expected, отримав $result, exit code $exit_code)"
     FAILED=1
   fi
+  echo " "
 
 done < "$TESTS_FILE"
+echo "PERMISSION SELF-CHECK - done."
 
 # повертаємо 0 тільки якщо всі тести пройшли — той, хто викликав цей скрипт,
 # перевіряє цей код і вирішує, чи відкривати сесію далі

@@ -19,7 +19,7 @@ shift 2
 FINAL_COMMAND=("$@")
 
 # шлях до селфчек-скрипта: він лежить на рівень вище теки impl/
-SELFCHECK="$(dirname "$0")/../permission-inside-selfcheck.sh"
+SELFCHECK="$(dirname "$0")/../../permission-inside-selfcheck.sh"
 
 # без цього файлу немає сенсу запускати sandbox взагалі — перевірка прав не відбудеться
 if [ ! -f "$SELFCHECK" ]; then
@@ -44,7 +44,7 @@ done
 # і фінальна команда виконуються послідовно всередині одного виклику, а не
 # окремими sandbox-exec запусками — інакше обмеження б не переносились між ними
 sandbox-exec -f "$PROFILE_FILE" bash -c "
-  $QUOTED_SELFCHECK $QUOTED_TESTS_FILE
+  bash $QUOTED_SELFCHECK $QUOTED_TESTS_FILE
 
   # \$? тут — exit code selfcheck, отриманий одразу після його завершення
   if [ \$? -ne 0 ]; then
