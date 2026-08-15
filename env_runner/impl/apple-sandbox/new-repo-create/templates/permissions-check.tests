@@ -2,10 +2,32 @@
 # очікуваний_результат: "deny" (команда має впасти з помилкою) або
 #                        "allow" (команда має виконатись успішно)
 #
-# {{REPO_ABSOLUTE_PATH}} підставляється repos.sh реальним абсолютним шляхом до репо
+# 🎯готовий [permission-check.tests] для конкретного репозиторію будується шляхом заміни змінних
+# {{USER_ABSOLUTE_PATH}}
+# {{USER_LAB_ENV_ABSOLUTE_PATH}}
+# {{TEXT_FILE_IN_USER_LAB_ENV_ABSOLUTE_PATH}}
+# {{REPO_ABSOLUTE_PATH}}
 # в момент копіювання цього темплейту в runners/.
 
+
+# заборони до файлової системи
 Доступ до ~/Documents заблоковано|cd ~/Documents && ls|deny
-Доступ до ~/.ssh заблоковано|cat ~/.ssh/id_rsa|deny
+Доступ до ~/Downloads заблоковано|cd ~/Downloads && ls|deny
+Доступ до {user} заблоковано|cd {{USER_ABSOLUTE_PATH}} && ls|deny
+Доступ до {user_lab} заблоковано|cd {{USER_LAB_ENV_ABSOLUTE_PATH}} && ls|deny
+Створення файлу в {user_lab} заблоковано|cd {{USER_LAB_ENV_ABSOLUTE_PATH}} && touch sandbox-test-create.txt|deny
+Доступ до текстового файлу в {user_lab} заблоковано|cd {{TEXT_FILE_IN_USER_LAB_ENV_ABSOLUTE_PATH}} && ls|deny
+Видалення текстового файлу з {user_lab} заблоковано|rm {{TEXT_FILE_IN_USER_LAB_ENV_ABSOLUTE_PATH}}|deny
+Доступ до ~/.ssh заблоковано|cat ~/.ssh/test|deny
+
+# заборони до програм та утиліт
+Доступ до TextEdit заборонено|open -a TextEdit|deny
+Доступ до TextEdit заборонено|/usr/bin/open -a /System/Applications/TextEdit.app|deny
+Доступ до TextEdit із забороненим файлом заборонено|open -a TextEdit {{TEXT_FILE_IN_USER_LAB_ENV_ABSOLUTE_PATH}}|deny
+Доступ до TextEdit із забороненим файлом заборонено|/usr/bin/open -a /System/Applications/TextEdit.app {{TEXT_FILE_IN_USER_LAB_ENV_ABSOLUTE_PATH}}|deny
 Виконання /usr/bin/security заблоковано|/usr/bin/security|deny
+
+# Дозвіл до репозиторію
+Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && /bin/ls|allow
 Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && ls|allow
+

@@ -1,31 +1,69 @@
-;; Базовий whitelist-first sandbox-профіль для одного репозиторію.
-;; {{REPO_PATH}} підставляється repos.sh реальним абсолютним шляхом до репо
+;; 🎯готовий [permission-profile.sb] для конкретного репозиторію будується шляхом заміни змінних
+;; {{REPO_ABSOLUTE_PATH}} this is path to repo: .../repos/../repo/
+;; {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}} - this is file in .../runners/../repo/
+;; {{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}} - this is script path to .../_tools/.../permission-inside-selfcheck.sh
 ;; в момент копіювання цього темплейту в runners/.
 
 (version 1)
 
-;; забороняє все, що не дозволено явно нижче — фундамент whitelist-first підходу
+;; main rule: Deny first.
 (deny default)
 
-;; список бінарників, які дозволено запускати всередині цього репо;
-;; додавай сюди нові за потреби (напр. node, npm, git), інакше вони впадуть
-;; з "Operation not permitted"
+;; Without this import the "Abort trap: 6" error is received.
+;; This is the basic Apple's set of definitions and rules.
+(import "system.sb")
+
+
+;; 🎬 Section: 🛠️ Executions. Start. ----
+
+;; 1️⃣----
+;; [/bin/bash] is allowed.
 (allow process-exec
-  (literal "/bin/bash")
-  (literal "/bin/zsh")
-  (literal "/usr/bin/env"))
+  (literal "/bin/bash"))
+;; allow start [/bin/bash] by [bash] command
+(allow file-read-metadata
+  (literal "/bin/bash"))
 
-;; мінімальний набір системних шляхів для читання, без якого не запускаються
-;; навіть базові бінарники з переліку вище
+;; 2️⃣----
+;; [/bin/ls] is allowed.
+(allow process-exec
+  (literal "/bin/ls"))
+;; allow start [/bin/ls] by [ls] command
+(allow file-read-metadata
+  (literal "/bin/ls"))
+
+;; 3️⃣----
+;; [/bin/cat] is allowed.
+(allow process-exec
+  (literal "/bin/cat"))
+;; allow start [/bin/cat] by [cat] command
+(allow file-read-metadata
+  (literal "/bin/cat"))
+
+;; 🏁 Section: 🛠️ Executions. Done. ----
+
+
+;; Дозволяємо створення дочірніх процесів.
+;; Це потрібно bash та іншим програмам, які запускають subprocess.
+;; (allow process-fork)
+
+;; 🎬 Section: 📂 Filesystem access. Start. ----
+
+;; 1️⃣----
+;; [path to current repo code] is allowed to 📚 read and ✍️ write.
 (allow file-read*
-  (subpath "/usr/lib")
-  (subpath "/System/Library")
-  (subpath "/private/var/db/dyld"))
+  (subpath {{REPO_ABSOLUTE_PATH}}))
+(allow file-write*
+  (subpath {{REPO_ABSOLUTE_PATH}}))
 
-;; повний доступ на читання й запис — тільки в межах цього конкретного репозиторію
-(allow file-read* file-write*
-  (subpath "{{REPO_ABSOLUTE_PATH}}"))
+;; 2️⃣----
+;; [path to permissions check file for current repo in the runners branch] is allowed to 📚 read only.
+(allow file-read*
+  (literal {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}))
 
-;; дозволяє мережу для цього репо; закоментуй рядок нижче, якщо цей репо
-;; не повинен мати доступу до інтернету
-(allow network*)
+;; 3️⃣----
+;; [path to _tools/env-runner/permission self check script file] is allowed to 📚 read only.
+(allow file-read*
+  (literal {{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}}))
+
+;; 🏁 Section: 📂 Filesystem access. Done. ----

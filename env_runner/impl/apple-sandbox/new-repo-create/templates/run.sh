@@ -9,6 +9,19 @@
 #   .../patch to repo/run.sh <command> [args...]
 # Приклад:
 #   .../patch to repo/run.sh claude
+#
+#
+#
+# 🎯готовий [run.sh] для конкретного репозиторію будується шляхом заміни змінних
+# {{REPO_ABSOLUTE_PATH}}
+# {{MAIN_ENV_RUNNER_ABSOLUTE_PATH}}
+# {{APPLE_SANDBOX_METHOD_NAME}}
+# {{PERMISSION_PROFILE_ABSOLUTE_PATH}}
+# {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}
+# в момент копіювання цього темплейту в runners/.
+
+# перейти в папку проект
+cd "{{REPO_ABSOLUTE_PATH}}"
 
 # абсолютний шлях до env_runner/run.sh — спільної точки входу для будь-якого
 # репозиторію, незалежно від методу ізоляції.
@@ -19,5 +32,5 @@ ENV_RUNNER="{{MAIN_ENV_RUNNER_ABSOLUTE_PATH}}"
 "$ENV_RUNNER" \
   --method="{{APPLE_SANDBOX_METHOD_NAME}}" \
   --profile="{{PERMISSION_PROFILE_ABSOLUTE_PATH}}" \
-  --tests="{{PERMISSION_CHECK_ABSOLUTE_PATH}}" \
+  --tests="{{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}" \
   -- "$@"

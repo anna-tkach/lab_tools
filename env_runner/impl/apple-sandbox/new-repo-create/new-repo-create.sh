@@ -18,7 +18,7 @@
 ## include constants
 # get current directory where current script is placed (even if someone other called it from other place).
 SCRIPT_ABSOLUTE_PATH="$(dirname "$0")"
-echo "SCRIPT_ABSOLUTE_PATH = $SCRIPT_ABSOLUTE_PATH"
+echo "SCRIPT_ABSOLUTE_PATH: $SCRIPT_ABSOLUTE_PATH"
 # 1. include /env_runner/impl/apple-sandbox/new-repo-create/constants.sh
 # because we need all of them.
 source "$SCRIPT_ABSOLUTE_PATH/constants.sh"
@@ -28,6 +28,17 @@ source "$SCRIPT_ABSOLUTE_PATH/../../../constants.sh"
 
 # functions
 create_file_if_needed() {
+  # {{USER_ABSOLUTE_PATH}}
+  # {{USER_LAB_ENV_ABSOLUTE_PATH}}
+  # {{TEXT_FILE_IN_USER_LAB_ENV_ABSOLUTE_PATH}}
+  # {{REPO_ABSOLUTE_PATH}} +
+  # {{MAIN_ENV_RUNNER_ABSOLUTE_PATH}}
+  # {{APPLE_SANDBOX_METHOD_NAME}}
+  # {{PERMISSION_PROFILE_ABSOLUTE_PATH}} +
+  # {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}} +
+  # {{REPO_RUNNER_PERMISSION_CHECK_TESTS_FILE_ABSOLUTE_PATH}}
+  # {{TOOL_ENV_RUNNER_PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}}
+
   # make sure we have 4 inputs
   if [ "$#" -ne 4 ]; then
     echo "Використання: $0 <RUNNERS_ABSOLUTE_PATH> <REPO_ABSOLUTE_PATH> <METHOD_NAME> <FILE_NAME>"
@@ -65,23 +76,10 @@ create_file_if_needed() {
   ## build all needed vars to replace them in the template before copying it into the runner of the repo.
   # build absolute paths for permission profile and permission check files inside of this runner (we need this paths for replacing templates with real paths).
   PERMISSION_PROFILE_ABSOLUTE_PATH="$RUNNERS_METHOD_ABSOLUTE_PATH/$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_PROFILE_FILE_NAME"
-  PERMISSION_CHECK_ABSOLUTE_PATH="$RUNNERS_METHOD_ABSOLUTE_PATH/$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_FILE_NAME"
+  PERMISSION_CHECK_TESTS_ABSOLUTE_PATH="$RUNNERS_METHOD_ABSOLUTE_PATH/$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_TESTS_FILE_NAME"
   # build absolute path to the main run.sh which must be called by each repo runner.
   ENV_RUNNER_DIR="$(cd "$SCRIPT_ABSOLUTE_PATH/../../.." && pwd)"
-  MAIN_ENV_RUNNER_ABSOLUTE_PATH="$ENV_RUNNER_DIR/env_runner/run.sh"
-
-
-  echo "DEBUG:"
-  echo "  RUNNERS_ABSOLUTE_PATH                 = [$RUNNERS_ABSOLUTE_PATH]"
-  echo "  REPO_ABSOLUTE_PATH                    = [$REPO_ABSOLUTE_PATH]"
-  echo "  METHOD_NAME                           = [$METHOD_NAME]"
-  echo "  FILE_NAME                             = [$FILE_NAME]"
-  echo "  PERMISSION_PROFILE_ABSOLUTE_PATH      = [$PERMISSION_PROFILE_ABSOLUTE_PATH]"
-  echo "  PERMISSION_CHECK_ABSOLUTE_PATH        = [$PERMISSION_CHECK_ABSOLUTE_PATH]"
-  echo "  ENV_RUNNER_DIR                        = [$ENV_RUNNER_DIR]"
-  echo "  MAIN_ENV_RUNNER_ABSOLUTE_PATH         = [$MAIN_ENV_RUNNER_ABSOLUTE_PATH]"
-  echo "  FILE_TEMPLATE_ABSOLUTE_PATH           = [$FILE_TEMPLATE_ABSOLUTE_PATH]"
-  echo "  ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_ABSOLUTE_PATH         = [$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_ABSOLUTE_PATH]"
+  MAIN_ENV_RUNNER_ABSOLUTE_PATH="$ENV_RUNNER_DIR/run.sh"
 
   ## 1) take template 2) replace vars with values and 3) put built content into creating file.
   sed \
@@ -89,8 +87,11 @@ create_file_if_needed() {
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_MAIN_ENV_RUNNER_ABSOLUTE_PATH|$MAIN_ENV_RUNNER_ABSOLUTE_PATH|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_METHOD_NAME|$METHOD_NAME|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_RUNNER_PERMISSION_PROFILE_ABSOLUTE_PATH|$PERMISSION_PROFILE_ABSOLUTE_PATH|g" \
-    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_RUNNER_PERMISSION_CHECK_ABSOLUTE_PATH|$PERMISSION_CHECK_ABSOLUTE_PATH|g" \
+    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_RUNNER_PERMISSION_CHECK_TESTS_ABSOLUTE_PATH|$PERMISSION_CHECK_TESTS_ABSOLUTE_PATH|g" \
     "$FILE_TEMPLATE_ABSOLUTE_PATH" > "$FILE_ABSOLUTE_PATH"
+
+  # give to current user on machine access to execute this file
+  chmod u+x "$FILE_ABSOLUTE_PATH"
 
   echo "  [OK] File at $FILE_ABSOLUTE_PATH is created (from template)."
 }
@@ -118,7 +119,7 @@ METHOD_NAME="$ENV_RUNNER_METHOD_APPLE_SANDBOX"
 # create permission profile file.
 create_file_if_needed "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_PROFILE_FILE_NAME"
 # create permission check file.
-create_file_if_needed "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_FILE_NAME"
+create_file_if_needed "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_TESTS_FILE_NAME"
 # create run.sh file for the repo.
 create_file_if_needed "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_RUNNER_FILE_NAME"
 echo "Раннер (метод $METHOD_NAME) для репозиторію створено."
