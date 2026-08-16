@@ -45,25 +45,25 @@
 
 ;; Дозволяємо створення дочірніх процесів.
 ;; Це потрібно bash та іншим програмам, які запускають subprocess.
-;; (allow process-fork)
+(allow process-fork)
 
 ;; 🎬 Section: 📂 Filesystem access. Start. ----
 
 ;; 1️⃣----
 ;; [path to current repo code] is allowed to 📚 read and ✍️ write.
 (allow file-read*
-  (subpath {{REPO_ABSOLUTE_PATH}}))
+  (subpath "{{REPO_ABSOLUTE_PATH}}"))
 (allow file-write*
-  (subpath {{REPO_ABSOLUTE_PATH}}))
+  (subpath "{{REPO_ABSOLUTE_PATH}}"))
 
 ;; 2️⃣----
 ;; [path to permissions check file for current repo in the runners branch] is allowed to 📚 read only.
 (allow file-read*
-  (literal {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}))
+  (literal "{{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}"))
 
 ;; 3️⃣----
 ;; [path to _tools/env-runner/permission self check script file] is allowed to 📚 read only.
 (allow file-read*
-  (literal {{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}}))
+  (literal "{{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}}"))
 
 ;; 🏁 Section: 📂 Filesystem access. Done. ----

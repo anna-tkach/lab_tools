@@ -13,8 +13,6 @@
 # Використання:
 #   new-repo-create.sh RUNNERS_ABSOLUTE_PATH REPO_ABSOLUTE_PATH
 
-
-
 ## include constants
 # get current directory where current script is placed (even if someone other called it from other place).
 SCRIPT_ABSOLUTE_PATH="$(dirname "$0")"
@@ -26,19 +24,13 @@ source "$SCRIPT_ABSOLUTE_PATH/constants.sh"
 # because we need apple-sandbox method name from here.
 source "$SCRIPT_ABSOLUTE_PATH/../../../constants.sh"
 
+# 3. Build extra paths
+USER_ABSOLUTE_PATH="$HOME"
+USER_LAB_ABSOLUTE_PATH="$(cd "$LAB_ROOT_DIRECTORY" && pwd)"
+TEXT_FILE_IN_USER_LAB_ABSOLUTE_PATH="$USER_LAB_ABSOLUTE_PATH/sandbox-test.txt"
+
 # functions
 create_file_if_needed() {
-  # {{USER_ABSOLUTE_PATH}}
-  # {{USER_LAB_ENV_ABSOLUTE_PATH}}
-  # {{TEXT_FILE_IN_USER_LAB_ENV_ABSOLUTE_PATH}}
-  # {{REPO_ABSOLUTE_PATH}} +
-  # {{MAIN_ENV_RUNNER_ABSOLUTE_PATH}}
-  # {{APPLE_SANDBOX_METHOD_NAME}}
-  # {{PERMISSION_PROFILE_ABSOLUTE_PATH}} +
-  # {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}} +
-  # {{REPO_RUNNER_PERMISSION_CHECK_TESTS_FILE_ABSOLUTE_PATH}}
-  # {{TOOL_ENV_RUNNER_PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}}
-
   # make sure we have 4 inputs
   if [ "$#" -ne 4 ]; then
     echo "Використання: $0 <RUNNERS_ABSOLUTE_PATH> <REPO_ABSOLUTE_PATH> <METHOD_NAME> <FILE_NAME>"
@@ -80,14 +72,21 @@ create_file_if_needed() {
   # build absolute path to the main run.sh which must be called by each repo runner.
   ENV_RUNNER_DIR="$(cd "$SCRIPT_ABSOLUTE_PATH/../../.." && pwd)"
   MAIN_ENV_RUNNER_ABSOLUTE_PATH="$ENV_RUNNER_DIR/run.sh"
+  # build absolute path to the main permission-inside-self-check.sh.
+  # It is required to give access to this file in this sandbox to have possibility to perform check.
+  PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH="$ENV_RUNNER_DIR/permission-inside-selfcheck.sh"
 
   ## 1) take template 2) replace vars with values and 3) put built content into creating file.
   sed \
+    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_USER_ABSOLUTE_PATH|$USER_ABSOLUTE_PATH|g" \
+    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_USER_LAB_ABSOLUTE_PATH|$USER_LAB_ABSOLUTE_PATH|g" \
+    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_TEXT_FILE_IN_USER_LAB_ABSOLUTE_PATH|$TEXT_FILE_IN_USER_LAB_ABSOLUTE_PATH|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_ABSOLUTE_PATH|$REPO_ABSOLUTE_PATH|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_MAIN_ENV_RUNNER_ABSOLUTE_PATH|$MAIN_ENV_RUNNER_ABSOLUTE_PATH|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_METHOD_NAME|$METHOD_NAME|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_RUNNER_PERMISSION_PROFILE_ABSOLUTE_PATH|$PERMISSION_PROFILE_ABSOLUTE_PATH|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_RUNNER_PERMISSION_CHECK_TESTS_ABSOLUTE_PATH|$PERMISSION_CHECK_TESTS_ABSOLUTE_PATH|g" \
+    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_RUNNER_PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH|$PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH|g" \
     "$FILE_TEMPLATE_ABSOLUTE_PATH" > "$FILE_ABSOLUTE_PATH"
 
   # give to current user on machine access to execute this file
