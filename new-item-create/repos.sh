@@ -9,7 +9,7 @@
 #   new-project.sh client-1 billing-system backend frontend
 
 # зупинити скрипт одразу, якщо будь-яка команда впаде з помилкою
-set -e
+set -euo pipefail
 
 # усі 3 вхідні параметри мають - інакше скрипт закінчується із помилкою
 if [ "$#" -lt 3 ]; then
@@ -55,10 +55,10 @@ for REPO in "${REPOS[@]}"; do
     echo "  [OK] $REPO_DIR"
   done
 
-  # 2. for repo create runner in /runners/ branch
-  RUNNERS_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS/$REPO_SUBPATH"
+  # 2. for repo create runner in /runners/ branch & ssh in /vault/ branch.
   REPO_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_REPOS/$REPO_SUBPATH"
-  "$TOOLS_DIR/env_runner/new-repo-create.sh" "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH"
+  RUNNER_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS/$REPO_SUBPATH"
+  "$TOOLS_DIR/env_runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH"
 
 done
 

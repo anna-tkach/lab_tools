@@ -100,7 +100,7 @@ create_file_if_needed() {
 
 # зупиняє виконання скрипта одразу, якщо будь-яка команда в ньому впаде
 # з помилкою — без цього bash за замовчуванням ігнорує помилку і йде далі
-set -e
+set -euo pipefail
 
 # make sure we have 2 inputs
 if [ "$#" -ne 2 ]; then

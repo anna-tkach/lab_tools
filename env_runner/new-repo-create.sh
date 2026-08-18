@@ -11,15 +11,15 @@
 
 # зупиняє виконання скрипта одразу, якщо будь-яка команда в ньому впаде
 # з помилкою — без цього bash за замовчуванням ігнорує помилку і йде далі
-set -e
+set -euo pipefail
 
 if [ "$#" -ne 2 ]; then
-  echo "Використання: $0 <RUNNERS_ABSOLUTE_PATH> <REPO_ABSOLUTE_PATH>"
+  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH>
   exit 1
 fi
 
-RUNNERS_ABSOLUTE_PATH="$1"
-REPO_ABSOLUTE_PATH="$2"
+REPO_ABSOLUTE_PATH="$1"
+RUNNER_ABSOLUTE_PATH="$2"
 
 # "$(dirname "$0")" — тека, де лежить сам new-repo-create.sh, тобто env_runner/
 SCRIPT_DIR="$(dirname "$0")"
@@ -29,6 +29,7 @@ source "$SCRIPT_DIR/constants.sh"
 for METHOD in "${ENV_RUNNER_METHODS[@]}"; do
   IMPL_SCRIPT="$SCRIPT_DIR/impl/$METHOD/new-repo-create/new-repo-create.sh"
 
+  # 1. Визначаємо метод для раннера
   # захист від відсутньої реалізації: якщо метод є в списку, але для нього
   # ще не написано new-repo-create.sh, краще впасти з чіткою помилкою,
   # ніж мовчки пропустити метод
@@ -37,6 +38,8 @@ for METHOD in "${ENV_RUNNER_METHODS[@]}"; do
     exit 1
   fi
 
+  # 2. Створюємо раннер
   echo "Створюю раннер методу '$METHOD' для репозиторію '$REPO'..."
-  "$IMPL_SCRIPT" "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH"
+  "$IMPL_SCRIPT" "RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH"
+
 done
