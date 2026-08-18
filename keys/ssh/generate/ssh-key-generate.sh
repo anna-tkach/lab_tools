@@ -9,9 +9,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Підключаємо константи рівня ssh (специфічні для SSH-ключів)
-source "${SCRIPT_DIR}/constants.sh"
-# Підключаємо константи рівня keys (спільні для всіх типів ключів)
 source "${SCRIPT_DIR}/../constants.sh"
+# Підключаємо константи рівня keys (спільні для всіх типів ключів)
+source "${SCRIPT_DIR}/../../constants.sh"
 
 # Скрипт очікує три позиційні аргументи: ім'я ключа, шлях до кореня репозиторію в vault та email для коментаря ключа
 if [[ $# -ne 3 ]]; then
@@ -37,15 +37,19 @@ PUBLIC_KEY_PATH="${PRIVATE_KEY_PATH}.pub"
 
 # Перевіряємо, чи вже існує приватний ключ саме з таким іменем у цій директорії
 if [[ -f "$PRIVATE_KEY_PATH" ]]; then
-  echo "SSH-ключ '${KEY_NAME}' для '${VAULT_ABSOLUTE_PATH}' вже існує: ${PRIVATE_KEY_PATH}. Створення пропущено."
+  echo "SSH-ключ '${KEY_NAME}' для '${VAULT_ABSOLUTE_PATH}' вже існує: ${PRIVATE_KEY_PATH}. Створення пропущено." >&2
+  # Повертаємо шляхи до стандартного потоку виводу (stdout)
+  echo "$SSH_DIR"
+  echo "$PRIVATE_KEY_PATH"
+  echo "$PUBLIC_KEY_PATH"
   exit 0
 fi
 
 # Створюємо директорію keys/ssh разом з батьківськими, якщо їх ще немає (mkdir -p ідемпотентний)
 mkdir -p "$SSH_DIR"
 
-echo "Створюємо новий SSH-ключ (${SSH_TYPE}) з іменем '${KEY_NAME}' у ${PRIVATE_KEY_PATH}"
-echo "Зараз потрібно буде ввести passphrase (двічі) — приватний ключ буде зашифровано ним на диску."
+echo "Створюємо новий SSH-ключ (${SSH_TYPE}) з іменем '${KEY_NAME}' у ${PRIVATE_KEY_PATH}" >&2
+echo "Зараз потрібно буде ввести passphrase (двічі) — приватний ключ буде зашифровано ним на диску." >&2
 
 # Генеруємо пару ключів; без -N, тому ssh-keygen сам інтерактивно запитає passphrase
 ssh-keygen -t "$SSH_TYPE" -C "$EMAIL" -f "$PRIVATE_KEY_PATH"
@@ -59,4 +63,9 @@ if ssh-keygen -y -P "" -f "$PRIVATE_KEY_PATH" >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Готово: приватний ключ ${PRIVATE_KEY_PATH}, публічний ключ ${PUBLIC_KEY_PATH}"
+echo "Готово: приватний ключ ${PRIVATE_KEY_PATH}, публічний ключ ${PUBLIC_KEY_PATH}" >&2
+
+# Повертаємо 3 значення у stdout (по одному на рядок)
+echo "$SSH_DIR"
+echo "$PRIVATE_KEY_PATH"
+echo "$PUBLIC_KEY_PATH"

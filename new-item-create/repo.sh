@@ -63,7 +63,8 @@ echo ""
 
 # 3. for repo generate ssh-key for repo-remote-connection in /vault/ branch.
 VAULT_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_VAULT/$REPO_SUBPATH"
-"$TOOLS_DIR/keys/ssh/ssh-key-repo-remote-connection-generate.sh" "$VAULT_ABSOLUTE_PATH" "$EMAIL"
+REPO_ALIAS="$OWNER-$PROJECT-$REPO"
+"$TOOLS_DIR/keys/ssh/generate/repo-remote-connection/ssh-key-repo-remote-connection-generate.sh" "$REPO_ALIAS" "$REPO_ABSOLUTE_PATH" "$VAULT_ABSOLUTE_PATH" "$EMAIL"
 echo "Крок 3️⃣  готово. Створено зашифрований shh ключ (в .../vault/...)."
 echo ""
 
