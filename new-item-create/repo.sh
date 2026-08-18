@@ -12,8 +12,8 @@
 set -euo pipefail
 
 # усі 3 вхідні параметри мають - інакше скрипт закінчується із помилкою
-if [ "$#" -lt 3 ]; then
-  echo "Використання: $0 <owner> <project> <repo>"
+if [ "$#" -lt 4 ]; then
+  echo "Використання: $0 <owner> <project> <repo> <email>"
   echo "  owner: 'own' або назва клієнта, напр. 'client-1'"
   exit 1
 fi
@@ -22,6 +22,7 @@ fi
 OWNER="$1"
 PROJECT="$2"
 REPO="$3"
+EMAIL="$4"
 
 # "$(dirname "$0")" — тека, де лежить цей скрипт
 SCRIPT_DIR="$(dirname "$0")"
@@ -38,7 +39,7 @@ source "$TOOLS_DIR/constants.sh"
 # підключає utils для визначення шляхів
 source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
-echo "Створюю структуру для репозиторія '$REPO' (owner: $OWNER, project $PROJECT)."
+echo "Створюється репозиторій: '$REPO' (owner: $OWNER, project $PROJECT)..."
 # створюємо необхідний репозиторій (із необхідною структурою) в проекті в овнері в кожній гілці.
 # 0. for repo build su path
 REPO_SUBPATH=$(compute_repo_subpath "$OWNER" "$PROJECT" "$REPO")
@@ -50,11 +51,21 @@ for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
   mkdir -p "$REPO_DIR"
   echo "  [OK] $REPO_DIR"
 done
+echo "Крок 1️⃣  готово. Створено структуру."
+echo ""
 
-# 2. for repo create runner in /runners/ branch & ssh in /vault/ branch.
+# 2. for repo create runner in /runners/ branch.
 REPO_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_REPOS/$REPO_SUBPATH"
 RUNNER_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS/$REPO_SUBPATH"
 "$TOOLS_DIR/env_runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH"
+echo "Крок️ 2️⃣  готово. Створено runner.sh (в .../runners/...)."
+echo ""
 
-echo "Готово. Структура створена для репозиторія '$REPO' (owner: $OWNER, project $PROJECT)."
+# 3. for repo generate ssh-key for repo-remote-connection in /vault/ branch.
+VAULT_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_VAULT/$REPO_SUBPATH"
+"$TOOLS_DIR/keys/ssh/ssh-key-repo-remote-connection-generate.sh" "$VAULT_ABSOLUTE_PATH" "$EMAIL"
+echo "Крок 3️⃣  готово. Створено зашифрований shh ключ (в .../vault/...)."
+echo ""
+
+echo "✅ Створено репозиторій."
 echo ""
