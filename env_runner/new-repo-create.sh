@@ -40,6 +40,6 @@ for METHOD in "${ENV_RUNNER_METHODS[@]}"; do
 
   # 2. Створюємо раннер
   echo "Створюю раннер методу '$METHOD' для репозиторію '$REPO'..."
-  "$IMPL_SCRIPT" "RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH"
+  "$IMPL_SCRIPT" "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH"
 
 done
