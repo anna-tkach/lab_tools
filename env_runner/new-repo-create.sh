@@ -14,7 +14,7 @@
 set -euo pipefail
 
 if [ "$#" -ne 2 ]; then
-  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH>
+  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH>"
   exit 1
 fi
 
