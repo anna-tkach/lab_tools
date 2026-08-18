@@ -5,8 +5,8 @@
 #   new-project.sh <owner> <project> <repo>
 #
 # Приклади:
-#   new-project.sh own translator browser-extension
-#   new-project.sh client-1 billing-system backend
+#   repo.sh own translator browser-extension
+#   repo.sh client-1 billing-system backend
 
 # зупинити скрипт одразу, якщо будь-яка команда впаде з помилкою
 set -euo pipefail
@@ -57,7 +57,7 @@ echo ""
 # 2. for repo create runner in /runners/ branch.
 REPO_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_REPOS/$REPO_SUBPATH"
 RUNNER_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS/$REPO_SUBPATH"
-"$TOOLS_DIR/env_runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH"
+"$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH"
 echo "Крок️ 2️⃣  готово. Створено runner.sh (в .../runners/...)."
 echo ""
 

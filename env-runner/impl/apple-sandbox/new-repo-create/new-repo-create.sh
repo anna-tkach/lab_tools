@@ -1,5 +1,5 @@
 #!/bin/bash
-# _tools/env_runner/impl/apple-sandbox/new-repo-create/new-repo-create.sh
+# _tools/env-runner/impl/apple-sandbox/new-repo-create/new-repo-create.sh
 #
 # Створює всі необхідні файли (run.sh, permissions-profile.sb, permissions-check.tests) для запуску репозиторію в apple-sandbox.
 # Ці файли створюються в папці .../runners/...path to repo/apple-sandbox/, де .../runners/...path to repo/ = вхідний парематр RUNNERS_ABSOLUTE_PATH.
@@ -17,10 +17,10 @@
 # get current directory where current script is placed (even if someone other called it from other place).
 SCRIPT_ABSOLUTE_PATH="$(dirname "$0")"
 echo "SCRIPT_ABSOLUTE_PATH: $SCRIPT_ABSOLUTE_PATH"
-# 1. include /env_runner/impl/apple-sandbox/new-repo-create/constants.sh
+# 1. include /env-runner/impl/apple-sandbox/new-repo-create/constants.sh
 # because we need all of them.
 source "$SCRIPT_ABSOLUTE_PATH/constants.sh"
-# 2. include /env_runner/constants.sh
+# 2. include /env-runner/constants.sh
 # because we need apple-sandbox method name from here.
 source "$SCRIPT_ABSOLUTE_PATH/../../../constants.sh"
 
@@ -122,4 +122,8 @@ create_file_if_needed "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$METHOD_NA
 create_file_if_needed "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_TESTS_FILE_NAME"
 # create run.sh file for the repo.
 create_file_if_needed "$RUNNERS_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_RUNNER_FILE_NAME"
+
 echo "Раннер (метод $METHOD_NAME) для репозиторію створено."
+echo ""
+
+

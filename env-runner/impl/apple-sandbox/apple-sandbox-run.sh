@@ -1,5 +1,5 @@
 #!/bin/bash
-# _tools/env_runner/impl/apple-sandbox-run.sh
+# _tools/env-runner/impl/apple-sandbox-run.sh
 #
 # Конкретна реалізація запуску ізольованого середовища через macOS sandbox-exec.
 # Викликається з run.sh, коли METHOD=apple-sandbox.

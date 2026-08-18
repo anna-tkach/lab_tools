@@ -1,5 +1,5 @@
 #!/bin/bash
-# _tools/env_runner/new-repo-create.sh
+# _tools/env-runner/new-repo-create.sh
 #
 # Оркестратор: не знає нічого про конкретний метод ізоляції, лише перебирає
 # список ENV_RUNNER_METHODS і викликає власний new-repo-create.sh кожного
@@ -21,7 +21,7 @@ fi
 REPO_ABSOLUTE_PATH="$1"
 RUNNER_ABSOLUTE_PATH="$2"
 
-# "$(dirname "$0")" — тека, де лежить сам new-repo-create.sh, тобто env_runner/
+# "$(dirname "$0")" — тека, де лежить сам new-repo-create.sh, тобто env-runner/
 SCRIPT_DIR="$(dirname "$0")"
 # підключаємо з constants.sh на цьому ж рівні, там лежать ENV_RUNNER_METHODS
 source "$SCRIPT_DIR/constants.sh"

@@ -1,4 +1,4 @@
-# _tools/env_runner/impl/apple-sandbox/new-repo-create/constants.sh
+# _tools/env-runner/impl/apple-sandbox/new-repo-create/constants.sh
 
 # Names of files needed for apple-sandbox env
 ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_PROFILE_FILE_NAME=permission-profile.sb
