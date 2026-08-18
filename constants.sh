@@ -10,6 +10,7 @@ LAB_ROOT_DIRECTORY=~/lab
 LAB_ROOT_DIRECTORY_BRANCH_REPOS=repos
 # Гілка для всіх чутливих даних, якщо такі будуть. Якщо сюди щось попаде - воно має
 # бути зашифроване.
+# При стовренні репозиторію тут буде одразу створюватися новий зашифрований ssh ключ.
 LAB_ROOT_DIRECTORY_BRANCH_VAULT=vault
 # Гілка для скриптів-ранерів безпечного середовища для репозиторіїв.
 LAB_ROOT_DIRECTORY_BRANCH_RUNNERS=runners
