@@ -11,7 +11,7 @@
 #   .../patch to repo/run.sh claude
 #
 #
-#
+# {{TEMPLATE_VARS_DESCRIPTION}}
 # 🎯готовий [run.sh] для конкретного репозиторію будується шляхом заміни змінних
 # {{REPO_ABSOLUTE_PATH}}
 # {{MAIN_ENV_RUNNER_ABSOLUTE_PATH}}
@@ -19,6 +19,7 @@
 # {{PERMISSION_PROFILE_ABSOLUTE_PATH}}
 # {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}
 # в момент копіювання цього темплейту в runners/.
+# {{TEMPLATE_VARS_DESCRIPTION}}
 
 # перейти в папку проект
 cd "{{REPO_ABSOLUTE_PATH}}"
