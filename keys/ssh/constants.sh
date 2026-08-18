@@ -5,3 +5,4 @@
 SSH_TYPE="ed25519"
 # Назва піддиректорії всередині keys/, де зберігаються саме SSH-ключі
 SSH_VAULT_FOLDER_NAME="ssh"
+
