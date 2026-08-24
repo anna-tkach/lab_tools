@@ -40,11 +40,11 @@ while IFS="|" read -r description command expected; do
 
   # порівнюємо реальний результат з тим, що очікували в tests-файлі
   if [ "$result" == "$expected" ]; then
-    echo "[OK] $description"
+    echo "[OK ✅] $description"
   else
     # результат не збігся з очікуваним — це провал: або заборонене не заблокувалось,
     # або дозволене чомусь не спрацювало (наприклад, профіль занадто суворий)
-    echo "[FAIL] $description (очікував $expected, отримав $result, exit code $exit_code)"
+    echo "[FAIL ❌] $description (очікував $expected, отримав $result, exit code $exit_code)"
     FAILED=1
   fi
   echo " "
