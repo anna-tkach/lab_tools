@@ -2,11 +2,11 @@
 # _tools/new-item-create/repo.sh
 #
 # Використання:
-#   new-project.sh <owner> <project> <repo>
+#   sh repo.sh <owner> <project> <repo> <email>
 #
 # Приклади:
-#   repo.sh own translator browser-extension
-#   repo.sh client-1 billing-system backend
+#   sh repo.sh own translator browser-extension email@test.com
+#   sh repo.sh client-1 billing-system backend email@test.com
 
 # зупинити скрипт одразу, якщо будь-яка команда впаде з помилкою
 set -euo pipefail
@@ -57,7 +57,7 @@ echo ""
 # 2. for repo create runner in /runners/ branch.
 REPO_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_REPOS/$REPO_SUBPATH"
 RUNNER_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS/$REPO_SUBPATH"
-"$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH"
+"$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$LAB_GIT_USER_NAME" "$EMAIL"
 echo "Крок️ 2️⃣  готово. Створено runner.sh (в .../runners/...)."
 echo ""
 

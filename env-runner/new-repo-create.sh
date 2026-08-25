@@ -3,23 +3,25 @@
 #
 # Оркестратор: не знає нічого про конкретний метод ізоляції, лише перебирає
 # список ENV_RUNNER_METHODS і викликає власний new-repo-create.sh кожного
-# методу, передаючи йому owner/project/repo. Кожен метод сам вирішує, які
-# файли раннера йому потрібні і як їх створити.
+# методу, передаючи йому передані змінні транзитом.
+# Кожен метод сам вирішує, які файли раннера йому потрібні і як їх створити.
 #
 # Використання:
-#   new-repo-create.sh <owner> <project> <repo>
+#   sh new-repo-create.sh <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL>
 
 # зупиняє виконання скрипта одразу, якщо будь-яка команда в ньому впаде
 # з помилкою — без цього bash за замовчуванням ігнорує помилку і йде далі
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
-  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH>"
+if [ "$#" -ne 4 ]; then
+  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL>"
   exit 1
 fi
 
 REPO_ABSOLUTE_PATH="$1"
 RUNNER_ABSOLUTE_PATH="$2"
+USER_NAME="$3"
+USER_EMAIL="$4"
 
 # "$(dirname "$0")" — тека, де лежить сам new-repo-create.sh, тобто env-runner/
 SCRIPT_DIR="$(dirname "$0")"
@@ -40,6 +42,6 @@ for METHOD in "${ENV_RUNNER_METHODS[@]}"; do
 
   # 2. Створюємо раннер
   echo "Створюю раннер методу '$METHOD' для репозиторію '$REPO_ABSOLUTE_PATH'..."
-  "$IMPL_SCRIPT" "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH"
+  "$IMPL_SCRIPT" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$USER_NAME" "$USER_EMAIL"
 
 done

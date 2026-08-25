@@ -1,8 +1,15 @@
 #!/bin/bash
 # _tools/constants.sh
 
-# Шлях до директорії із усіма проектами
-LAB_ROOT_DIRECTORY=~/lab
+
+# include vars from .env file.
+[ -f "$(dirname "${BASH_SOURCE[0]}")/.env" ] && source "$(dirname "${BASH_SOURCE[0]}")/.env"
+
+# Шлях до директорії із усіма проектами (беремо з .env або ставимо дефолтне значення)
+LAB_ROOT_DIRECTORY="${LAB_ROOT_DIRECTORY:-~/lab}"
+
+# Default git user name. Needed because each repo has own $HOME with own .gitconfig.
+LAB_GIT_USER_NAME="${LAB_GIT_USER_NAME:-gitusername}"
 
 # Список усіх паралельних гілок дерева у кореневій папці, які всі будуть мати однакову структуру для проектів та репозиторіїв.
 # Але матимуть різний зміст, бо кожна із цих папок-гілок призначена для різного контенту.
@@ -17,3 +24,6 @@ LAB_ROOT_DIRECTORY_BRANCH_RUNNERS=runners
 
 # Всі гілки зібрані в 1 масив.
 LAB_ROOT_DIRECTORY_BRANCHES=($LAB_ROOT_DIRECTORY_BRANCH_REPOS $LAB_ROOT_DIRECTORY_BRANCH_VAULT $LAB_ROOT_DIRECTORY_BRANCH_RUNNERS)
+
+# Take all PATHS from .env to build sandbox paths
+REPO_RUNNER_VAR_PATH="${PATH_PYTHON3}:${PATH_RUBY}:${PATH_LOCAL_BIN}:${PATH_NVM_NODE_BIN}:${PATH_HOMEBREW_BIN}:${PATH_HOMEBREW_SBIN}:/usr/bin:/bin"
