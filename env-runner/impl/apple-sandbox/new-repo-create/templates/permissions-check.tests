@@ -31,4 +31,3 @@
 # Дозвіл до репозиторію
 Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && /bin/ls|allow
 Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && ls|allow
-

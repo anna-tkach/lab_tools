@@ -28,7 +28,6 @@ VAULT_ABSOLUTE_PATH="$3"
 EMAIL="$4"
 
 
-
 # Генеруємо шляхи - куди і які файли будуть генеруватися.
 source "${SCRIPT_DIR}/../utils_paths_computing.sh"
 SSH_KEYS_PATHS=()

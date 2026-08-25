@@ -1,71 +1,173 @@
 ;; {{TEMPLATE_VARS_DESCRIPTION}}
 ;; 🎯готовий [permission-profile.sb] для конкретного репозиторію будується шляхом заміни змінних
-;; {{REPO_ABSOLUTE_PATH}} this is path to repo: .../repos/../repo/
-;; {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}} - this is file in .../runners/../repo/
-;; {{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}} - this is script path to .../_tools/.../permission-inside-selfcheck.sh
 ;; в момент копіювання цього темплейту в runners/.
+;; {{REPO_ABSOLUTE_PATH}} this is path to repo: .../repos/../repo/
+;; {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}} - this is file with permission tests in the repo.
+;; {{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}} - this is script path to ../_tools/.../permission-inside-selfcheck.sh
+;; {{USER_ABSOLUTE_PATH}} - path to /Users/current user/
+;; {{MAC_OS_USER_ID}} - user id on the mac os, needed to build tmp directory path for Claude. can be taken by [id -u].
 ;; {{TEMPLATE_VARS_DESCRIPTION}}
+;;
+;; ============================================================================
+;; Apple Sandbox (Seatbelt) profile for Claude Code development
+;; ============================================================================
+;; Goal: a minimal but working sandbox for developing inside ONE repository,
+;; including running Claude Code itself inside it.
+;;
+;; Denied (by the default-deny baseline, never explicitly re-allowed):
+;;   - all other source code / repositories on the machine
+;;   - login Keychain (~/Library/Keychains) and Apple Passwords
+;;   - browser cookies / saved passwords (Chrome, Safari profiles)
+;;   - SSH keys and host git config (~/.ssh, ~/.gitconfig)
+;;   - sending signals to processes outside this sandbox
+;;
+;; Allowed: executing standard dev tools, outbound network, and read+write
+;; within the target repository only.
+;;
+;; NOTE on path traversal: a subpath rule grants access WITHIN that tree, not to
+;; its ancestors. Resolving an absolute path (getcwd, symlink resolution, dyld
+;; loading a binary) stat()s every parent directory, so non-standard roots need
+;; explicit file-read-metadata on each ancestor. Standard roots (/usr, /bin) are
+;; already covered by system.sb.
+;; ============================================================================
 
 (version 1)
 
-;; main rule: Deny first.
+;; Default-deny: everything not explicitly allowed below is forbidden.
 (deny default)
 
-;; Without this import the "Abort trap: 6" error is received.
-;; This is the basic Apple's set of definitions and rules.
+;; Apple's baseline rules. Without this the process dies with "Abort trap: 6".
 (import "system.sb")
 
-
-;; 🎬 Section: 🛠️ Executions. Start. ----
-
-;; 1️⃣----
-;; [/bin/bash] is allowed.
-(allow process-exec
-  (literal "/bin/bash"))
-;; allow start [/bin/bash] by [bash] command
-(allow file-read-metadata
-  (literal "/bin/bash"))
-
-;; 2️⃣----
-;; [/bin/ls] is allowed.
-(allow process-exec
-  (literal "/bin/ls"))
-;; allow start [/bin/ls] by [ls] command
-(allow file-read-metadata
-  (literal "/bin/ls"))
-
-;; 3️⃣----
-;; [/bin/cat] is allowed.
-(allow process-exec
-  (literal "/bin/cat"))
-;; allow start [/bin/cat] by [cat] command
-(allow file-read-metadata
-  (literal "/bin/cat"))
-
-;; 🏁 Section: 🛠️ Executions. Done. ----
-
-
-;; Дозволяємо створення дочірніх процесів.
-;; Це потрібно bash та іншим програмам, які запускають subprocess.
+;; Allow spawning child processes (shell, npm, git, claude all fork subprocesses).
 (allow process-fork)
 
-;; 🎬 Section: 📂 Filesystem access. Start. ----
+;; Job control / terminal ioctls on the controlling tty. Interactive CLIs
+;; (including claude) need TIOCSPGRP etc. to start; the tty device number varies
+;; per session, hence the regex. Trade-off: this also permits TIOCSTI on that
+;; tty, which the sandboxed process shares with the outer shell.
+(allow file-ioctl (regex #"^/dev/ttys[0-9]+$"))
 
-;; 1️⃣----
-;; [path to current repo code] is allowed to 📚 read and ✍️ write.
-(allow file-read*
-  (subpath "{{REPO_ABSOLUTE_PATH}}"))
-(allow file-write*
-  (subpath "{{REPO_ABSOLUTE_PATH}}"))
 
-;; 2️⃣----
-;; [path to permissions check file for current repo in the runners branch] is allowed to 📚 read only.
-(allow file-read*
-  (literal "{{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}"))
+;; ============================================================================
+;; Executions
+;; ============================================================================
 
-;; 3️⃣----
-;; [path to _tools/env-runner/permission self check script file] is allowed to 📚 read only.
-(allow file-read*
-  (literal "{{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}}"))
+;; System binaries.
+(allow process-exec (subpath "/bin"))
+(allow file-read*   (subpath "/bin"))
+(allow process-exec (subpath "/usr/bin"))
+(allow file-read*   (subpath "/usr/bin"))
 
-;; 🏁 Section: 📂 Filesystem access. Done. ----
+;; Homebrew tools (e.g. git). Binaries in /opt/homebrew/bin are symlinks into
+;; Cellar/opt; exec and dyld resolve the real target, so the whole /opt/homebrew
+;; tree is granted read+exec. /opt itself needs metadata to be traversed.
+(allow file-read-metadata (literal "/opt"))
+(allow process-exec       (subpath "/opt/homebrew"))
+(allow file-read*         (subpath "/opt/homebrew"))
+
+;; Node/npm (nvm) and its cache. Version-managed tools live outside standard
+;; system paths, so each manager's tree needs its own rule.
+(allow process-exec (subpath "{{USER_ABSOLUTE_PATH}}/.nvm"))
+(allow file-read*   (subpath "{{USER_ABSOLUTE_PATH}}/.nvm"))
+(allow process-exec (subpath "{{USER_ABSOLUTE_PATH}}/.npm"))
+(allow file-read*   (subpath "{{USER_ABSOLUTE_PATH}}/.npm"))
+
+;; Python (pyenv) and Ruby (rbenv). Their shims sit early in PATH; without access
+;; the shell's command lookup hits EPERM on them and never reaches later entries.
+(allow process-exec (subpath "{{USER_ABSOLUTE_PATH}}/.pyenv"))
+(allow file-read*   (subpath "{{USER_ABSOLUTE_PATH}}/.pyenv"))
+(allow process-exec (subpath "{{USER_ABSOLUTE_PATH}}/.rbenv"))
+(allow file-read*   (subpath "{{USER_ABSOLUTE_PATH}}/.rbenv"))
+
+;; Explicitly deny "capability" binaries that could reach secrets or the wider
+;; system. Most would also fail on their required IPC (Keychain, Apple Events,
+;; launchd), but denying exec is defense-in-depth.
+;; NOTE: /usr/bin/security is intentionally NOT denied — claude spawns it, and
+;; the Keychain itself stays unreachable via the filesystem/IPC rules anyway.
+;; Denying it explicitly causes Calude does not launch.
+;; NOTE: sudo/su are already blocked structurally (setuid is refused inside any
+;; sandbox); listing them is documentation, not the actual barrier.
+(deny process-exec
+  (literal "/usr/bin/sudo")
+  (literal "/usr/bin/su")
+  (literal "/usr/bin/osascript")
+  (literal "/bin/launchctl")
+  (literal "/usr/bin/launchctl")
+  (literal "/usr/bin/dscl")
+  (literal "/usr/bin/csrutil")
+  (literal "/usr/bin/pbcopy")
+  (literal "/usr/bin/pbpaste"))
+
+
+;; Claude Code.
+;; Claude/Bun per-user work directory. /tmp is a symlink to /private/tmp;
+;; ancestors need metadata for traversal, the claude-<uid> dir needs full access
+;; (it creates and writes session directories there).
+(allow file-read-metadata (literal "/tmp"))
+(allow file-read-metadata (literal "/private/tmp"))
+(allow file*              (subpath "/private/tmp/claude-{{MAC_OS_USER_ID}}"))
+
+
+;; Claude CLI. ~/.local/bin/claude is a symlink to a versioned binary under
+;; ~/.local/share/claude; exec and reads apply to the resolved target, so that
+;; tree gets read+exec while the ancestors only need metadata for traversal.
+(allow file-read-metadata (literal "{{USER_ABSOLUTE_PATH}}/.local"))
+(allow file-read-metadata (subpath "{{USER_ABSOLUTE_PATH}}/.local/bin"))
+(allow file-read-metadata (literal "{{USER_ABSOLUTE_PATH}}/.local/share"))
+(allow process-exec       (subpath "{{USER_ABSOLUTE_PATH}}/.local/share/claude"))
+(allow file-read*         (subpath "{{USER_ABSOLUTE_PATH}}/.local/share/claude"))
+
+
+;; ============================================================================
+;; Filesystem
+;; ============================================================================
+
+;; The target repository: full read+write.
+(allow file-read* (subpath "{{REPO_ABSOLUTE_PATH}}"))
+(allow file-write* (subpath "{{REPO_ABSOLUTE_PATH}}"))
+
+;; Allow to read-only some files inside of [runners] to make it work.
+(allow file-read* (literal "{{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}"))
+(allow file-read* (literal "{{PERMISSION_CHECK_SCRIPT_ABSOLUTE_PATH}}"))
+
+;; Allow to read-write into ...runners/.../.home/ - it is needed to make all bins (so Claude) work.
+;; This is the place for cached data for these bins.
+(allow file-read* (subpath "{{REPO_RUNNER_VAR_HOME}}"))
+(allow file-write* (subpath "{{REPO_RUNNER_VAR_HOME}}"))
+
+
+;; ============================================================================
+;; Network
+;; ============================================================================
+
+;; DNS resolution goes through mDNSResponder over IPC (separate from the socket
+;; itself); without this, hostname lookups fail even with outbound allowed.
+(allow mach-lookup (global-name "com.apple.mDNSResponder"))
+
+;; TLS trust store and OpenSSL config, read by curl/git/node for HTTPS.
+;; /etc is a symlink to /private/etc; ancestors need metadata for traversal.
+(allow file-read-metadata (literal "/etc"))
+(allow file-read-metadata (literal "/private"))
+(allow file-read-metadata (literal "/private/etc"))
+(allow file-read*         (subpath "/private/etc/ssl"))
+
+;; Outbound connections. Seatbelt filters by IP/port only, not by domain, so
+;; restricting traffic to specific hosts (e.g. api.anthropic.com) is not possible
+;; here. Domain-level control, if needed, requires a separate tool (e.g. LuLu).
+(allow network-outbound)
+
+;; Loopback listener for the OAuth callback during `claude` / `claude setup-token`
+;; login. Bound to localhost only: the sandboxed process can listen on 127.0.0.1
+;; for the browser's redirect, but cannot accept connections from the network.
+(allow network-bind    (local ip "localhost:*"))
+(allow network-inbound (local ip "localhost:*"))
+
+
+;; ============================================================================
+;; Signals
+;; ============================================================================
+
+;; kill / Ctrl-C / Ctrl-Z / job control, restricted to this sandbox's own
+;; process tree. Cannot signal processes outside the sandbox.
+(allow signal (target self))

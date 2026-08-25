@@ -13,16 +13,22 @@
 #
 # {{TEMPLATE_VARS_DESCRIPTION}}
 # 🎯готовий [run.sh] для конкретного репозиторію будується шляхом заміни змінних
+# в момент копіювання цього темплейту в runners/.
 # {{REPO_ABSOLUTE_PATH}}
 # {{MAIN_ENV_RUNNER_ABSOLUTE_PATH}}
 # {{APPLE_SANDBOX_METHOD_NAME}}
 # {{PERMISSION_PROFILE_ABSOLUTE_PATH}}
 # {{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}
-# в момент копіювання цього темплейту в runners/.
+# {{REPO_RUNNER_VAR_HOME}}
+# {{REPO_RUNNER_VAR_PATH}}
 # {{TEMPLATE_VARS_DESCRIPTION}}
 
 # перейти в папку проект
 cd "{{REPO_ABSOLUTE_PATH}}"
+
+# set HOME var to local repo path
+HOME="{{REPO_RUNNER_VAR_HOME}}"
+PATH="{{REPO_RUNNER_VAR_PATH}}"
 
 # абсолютний шлях до env-runner/run.sh — спільної точки входу для будь-якого
 # репозиторію, незалежно від методу ізоляції.
