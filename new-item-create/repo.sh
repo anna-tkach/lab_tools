@@ -48,7 +48,7 @@ echo "REPO_SUBPATH '$REPO_SUBPATH'"
 
 # 1. for the repo create structure for all branches
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  BRANCH_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$BRANCH" "$REPO_SUBPATH")
+  BRANCH_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$BRANCH")
   echo "BRANCH_ABSOLUTE_PATH: $BRANCH_ABSOLUTE_PATH"
   mkdir -p "$BRANCH_ABSOLUTE_PATH"
   echo "  [OK] $BRANCH_ABSOLUTE_PATH"
@@ -57,14 +57,14 @@ echo "Крок 1️⃣  готово. Створено структуру."
 echo ""
 
 # 2. for repo create runner in /runners/ branch.
-REPO_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$LAB_ROOT_DIRECTORY_BRANCH_REPOS" "$REPO_SUBPATH")
-RUNNER_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS" "$REPO_SUBPATH")
+REPO_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$LAB_ROOT_DIRECTORY_BRANCH_REPOS")
+RUNNER_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS")
 "$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$LAB_GIT_USER_NAME" "$EMAIL"
 echo "Крок️ 2️⃣  готово. Створено runner.sh (в .../runners/...)."
 echo ""
 
 # 3. for repo generate ssh-key for repo-remote-connection in /vault/ branch.
-VAULT_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_VAULT/$REPO_SUBPATH"
+VAULT_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$LAB_ROOT_DIRECTORY_BRANCH_VAULT")
 REPO_ALIAS="$OWNER-$PROJECT-$REPO"
 "$TOOLS_DIR/keys/ssh/generate/repo-remote-connection/ssh-key-repo-remote-connection-generate.sh" "$REPO_ALIAS" "$REPO_ABSOLUTE_PATH" "$VAULT_ABSOLUTE_PATH" "$EMAIL"
 echo "Крок 3️⃣  готово. Створено зашифрований shh ключ (в .../vault/...)."

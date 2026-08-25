@@ -6,10 +6,10 @@
 # нічого іншого не викликає, бо owner не залежить від жодного вищого рівня.
 #
 # Використання:
-#   owner.sh <owner>
+#   sh owner.sh <owner>
 # Приклади:
-#   owner.sh own
-#   owner.sh client-1
+#   sh owner.sh own
+#   sh owner.sh client-1
 
 # зупиняє виконання скрипта одразу, якщо будь-яка команда в ньому впаде
 # з помилкою — без цього bash за замовчуванням ігнорує помилку і йде далі
@@ -35,7 +35,8 @@ source "$TOOLS_DIR/utils_subpaths_computing.sh"
 echo "Створюю базову структуру для owner '$OWNER'."
 OWNER_SUBPATH=$(compute_owner_subpath "$OWNER")
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  BRANCH_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$BRANCH" "$OWNER_SUBPATH")
+  BRANCH_ABSOLUTE_PATH=$(compute_lab_owner_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$OWNER_SUBPATH" "$BRANCH")
+  echo "BRANCH_ABSOLUTE_PATH: $BRANCH_ABSOLUTE_PATH"
   mkdir -p "$BRANCH_ABSOLUTE_PATH"
   echo "  [OK] $BRANCH_ABSOLUTE_PATH"
 done

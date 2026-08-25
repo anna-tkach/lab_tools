@@ -6,10 +6,10 @@
 # існує в repos-дереві — спершу викликає owner.sh, щоб її створити.
 #
 # Використання:
-#   project.sh <owner> <project>
+#   sh project.sh <owner> <project>
 # Приклади:
-#   project.sh own translator
-#   project.sh client-1 billing-system
+#   sh project.sh own translator
+#   sh project.sh client-1 billing-system
 
 # зупиняє виконання скрипта одразу, якщо будь-яка команда в ньому впаде
 # з помилкою — без цього bash за замовчуванням ігнорує помилку і йде далі
@@ -42,7 +42,7 @@ source "$TOOLS_DIR/utils_subpaths_computing.sh"
 echo "Створюю структуру для проєкту '$PROJECT' (owner: $OWNER)"
 PROJECT_SUBPATH=$(compute_project_subpath "$OWNER" "$PROJECT")
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  BRANCH_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$BRANCH" "$PROJECT_SUBPATH")
+  BRANCH_ABSOLUTE_PATH=$(compute_lab_project_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$PROJECT_SUBPATH" "$BRANCH")
   # TODO - i don't know i this shared directory really needed
   mkdir -p "$BRANCH_ABSOLUTE_PATH/shared"
   echo "  [OK] $BRANCH_ABSOLUTE_PATH/shared"
