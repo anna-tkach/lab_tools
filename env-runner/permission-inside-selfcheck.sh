@@ -11,6 +11,10 @@ echo "PERMISSION SELF-CHECK - before started."
 TESTS_FILE="$1"
 FAILED=0
 
+# if mode == 0 -> we must check test hard
+# otherwise -> just show tests result but continue to start sandbox. This is flag for debugging.
+MODE=0
+
 # читаємо файл тестів рядок за рядком, розбиваючи кожен рядок по "|" на 3 змінні
 while IFS="|" read -r description command expected; do
   # пропускаємо порожні рядки та коментарі
@@ -50,8 +54,20 @@ while IFS="|" read -r description command expected; do
   echo " "
 
 done < "$TESTS_FILE"
-echo "PERMISSION SELF-CHECK - done."
 
+# Handle tests result - if it failed or not.
 # повертаємо 0 тільки якщо всі тести пройшли — той, хто викликав цей скрипт,
 # перевіряє цей код і вирішує, чи відкривати сесію далі
-exit $FAILED
+echo "FAILED: $FAILED"
+echo "MODE: $MODE"
+
+if [ "$FAILED" -eq 0 ]; then
+  echo "PERMISSION SELF-CHECK - done ✅."
+  exit 0
+elif [ "$MODE" -eq 0 ]; then
+  echo "PERMISSION SELF-CHECK - failed ❌."
+  exit $FAILED
+else
+  echo "PERMISSION SELF-CHECK - failed ❌ but this is [DEBUG] mode (won't throw error)."
+  exit 0
+fi
