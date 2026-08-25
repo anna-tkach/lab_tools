@@ -34,6 +34,7 @@ TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 # підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
 source "$TOOLS_DIR/constants.sh"
 # підключає utils для визначення шляхів
+source "$TOOLS_DIR/utils_paths_computing.sh"
 source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
 
@@ -41,10 +42,10 @@ source "$TOOLS_DIR/utils_subpaths_computing.sh"
 echo "Створюю структуру для проєкту '$PROJECT' (owner: $OWNER)"
 PROJECT_SUBPATH=$(compute_project_subpath "$OWNER" "$PROJECT")
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  PROJECT_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$PROJECT_SUBPATH"
+  BRANCH_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$BRANCH" "$PROJECT_SUBPATH")
   # TODO - i don't know i this shared directory really needed
-  mkdir -p "$PROJECT_DIR/shared"
-  echo "  [OK] $PROJECT_DIR/shared"
+  mkdir -p "$BRANCH_ABSOLUTE_PATH/shared"
+  echo "  [OK] $BRANCH_ABSOLUTE_PATH/shared"
 done
 
 echo "Готово. Структура створена для проєкту '$PROJECT' (owner: $OWNER)."

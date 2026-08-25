@@ -37,6 +37,7 @@ TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 # підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
 source "$TOOLS_DIR/constants.sh"
 # підключає utils для визначення шляхів
+source "$TOOLS_DIR/utils_paths_computing.sh"
 source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
 echo "Створюється репозиторій: '$REPO' (owner: $OWNER, project $PROJECT)..."
@@ -47,16 +48,17 @@ echo "REPO_SUBPATH '$REPO_SUBPATH'"
 
 # 1. for the repo create structure for all branches
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  REPO_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$REPO_SUBPATH"
-  mkdir -p "$REPO_DIR"
-  echo "  [OK] $REPO_DIR"
+  BRANCH_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$BRANCH" "$REPO_SUBPATH")
+  echo "BRANCH_ABSOLUTE_PATH: $BRANCH_ABSOLUTE_PATH"
+  mkdir -p "$BRANCH_ABSOLUTE_PATH"
+  echo "  [OK] $BRANCH_ABSOLUTE_PATH"
 done
 echo "Крок 1️⃣  готово. Створено структуру."
 echo ""
 
 # 2. for repo create runner in /runners/ branch.
-REPO_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_REPOS/$REPO_SUBPATH"
-RUNNER_ABSOLUTE_PATH="$LAB_ROOT_DIRECTORY/$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS/$REPO_SUBPATH"
+REPO_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$LAB_ROOT_DIRECTORY_BRANCH_REPOS" "$REPO_SUBPATH")
+RUNNER_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS" "$REPO_SUBPATH")
 "$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$LAB_GIT_USER_NAME" "$EMAIL"
 echo "Крок️ 2️⃣  готово. Створено runner.sh (в .../runners/...)."
 echo ""

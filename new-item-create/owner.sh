@@ -28,15 +28,16 @@ TOOLS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 # підключаємо constants.sh для викорситання глобальних констант, таких яких коренева директорія та гілки.
 source "$TOOLS_DIR/constants.sh"
 # підключає utils для визначення шляхів
+source "$TOOLS_DIR/utils_paths_computing.sh"
 source "$TOOLS_DIR/utils_subpaths_computing.sh"
 
 # створюємо необхідного овнера в кожній гілці.
 echo "Створюю базову структуру для owner '$OWNER'."
 OWNER_SUBPATH=$(compute_owner_subpath "$OWNER")
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
-  OWNER_DIR="$LAB_ROOT_DIRECTORY/$BRANCH/$OWNER_SUBPATH"
-  mkdir -p "$OWNER_DIR"
-  echo "  [OK] $OWNER_DIR"
+  BRANCH_ABSOLUTE_PATH=$(compute_lab_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$BRANCH" "$OWNER_SUBPATH")
+  mkdir -p "$BRANCH_ABSOLUTE_PATH"
+  echo "  [OK] $BRANCH_ABSOLUTE_PATH"
 done
 echo "Готово. Структура створена для owner '$OWNER'."
 echo ""
