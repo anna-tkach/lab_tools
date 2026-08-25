@@ -43,9 +43,9 @@ echo "Створюю структуру для проєкту '$PROJECT' (owner:
 PROJECT_SUBPATH=$(compute_project_subpath "$OWNER" "$PROJECT")
 for BRANCH in "${LAB_ROOT_DIRECTORY_BRANCHES[@]}"; do
   BRANCH_ABSOLUTE_PATH=$(compute_lab_project_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$PROJECT_SUBPATH" "$BRANCH")
-  # TODO - i don't know i this shared directory really needed
-  mkdir -p "$BRANCH_ABSOLUTE_PATH/shared"
-  echo "  [OK] $BRANCH_ABSOLUTE_PATH/shared"
+  echo "BRANCH_ABSOLUTE_PATH: $BRANCH_ABSOLUTE_PATH"
+  mkdir -p "$BRANCH_ABSOLUTE_PATH"
+  echo "  [OK] $BRANCH_ABSOLUTE_PATH"
 done
 
 echo "Готово. Структура створена для проєкту '$PROJECT' (owner: $OWNER)."
