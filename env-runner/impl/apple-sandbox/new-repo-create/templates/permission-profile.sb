@@ -96,8 +96,14 @@
   (literal "/usr/bin/launchctl")
   (literal "/usr/bin/dscl")
   (literal "/usr/bin/csrutil")
-  (literal "/usr/bin/pbcopy")
   (literal "/usr/bin/pbpaste"))
+
+
+;; Allow copy from terminal.
+;; /usr/bin/pbcopy process. Now it is allowed by allowing /usr/bin/ directory to exec.
+;; But also we need allow more to make it work.
+(allow mach-lookup          (global-name "com.apple.pasteboard.1"))
+(allow mach-lookup          (global-name "com.apple.lsd.mapdb"))
 
 
 ;; Claude Code.
