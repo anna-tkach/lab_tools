@@ -17,6 +17,8 @@ compute_owner_subpath() {
 
   if [ "$owner" == "own" ]; then
     echo "own"
+  elif [ "$owner" == "learning" ]; then
+    echo "learning"
   else
     echo "clients/$owner"
   fi
