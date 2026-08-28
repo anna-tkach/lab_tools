@@ -21,8 +21,21 @@ fi
 
 used_pct=$(printf '%s' "$input" | jq -r '.context_window.used_percentage // empty')
 remaining_pct=$(printf '%s' "$input" | jq -r '.context_window.remaining_percentage // empty')
+max_tokens=$(printf '%s' "$input" | jq -r '.context_window.context_window_size // empty')
+if [ -n "$max_tokens" ] && [ "$max_tokens" != "null" ]; then
+  max_tokens_display=$(awk -v t="$max_tokens" 'BEGIN{
+    if (t>=1000000) printf "%gm", t/1000000;
+    else if (t>=1000) printf "%gk", t/1000;
+    else printf "%d", t;
+  }')
+fi
+
 if [ -n "$used_pct" ] && [ "$used_pct" != "null" ]; then
-  ctx_display=$(printf '💭 %.0f%% / %.0f%%' "$remaining_pct" "$used_pct")
+  if [ -n "$max_tokens_display" ]; then
+    ctx_display=$(printf '💭 %.0f%% / %.0f%% (%s)' "$remaining_pct" "$used_pct" "$max_tokens_display")
+  else
+    ctx_display=$(printf '💭 %.0f%% / %.0f%%' "$remaining_pct" "$used_pct")
+  fi
 
   total_cells=10
   filled_cells=$(awk -v p="$used_pct" -v n="$total_cells" 'BEGIN{c=int(p/100*n+0.5); if(c>n)c=n; if(c<0)c=0; print c}')
