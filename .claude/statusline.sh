@@ -3,7 +3,8 @@
 input=$(cat)
 
 cwd=$(printf '%s' "$input" | jq -r '.workspace.current_dir // .cwd // empty')
-dir_display="🗂  ${cwd/#$HOME/~}"
+real_home=$(eval echo "~$(whoami)" 2>/dev/null || echo "$HOME")
+dir_display="🗂  ${cwd/#$real_home/~}"
 
 branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
 if [ -n "$branch" ]; then
