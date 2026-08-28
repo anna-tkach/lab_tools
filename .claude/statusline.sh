@@ -22,7 +22,7 @@ fi
 used_pct=$(printf '%s' "$input" | jq -r '.context_window.used_percentage // empty')
 remaining_pct=$(printf '%s' "$input" | jq -r '.context_window.remaining_percentage // empty')
 if [ -n "$used_pct" ] && [ "$used_pct" != "null" ]; then
-  ctx_display=$(printf '💭 ctx %.0f%% left (%.0f%% used)' "$remaining_pct" "$used_pct")
+  ctx_display=$(printf '💭 %.0f%% / %.0f%%' "$remaining_pct" "$used_pct")
 
   total_cells=10
   filled_cells=$(awk -v p="$used_pct" -v n="$total_cells" 'BEGIN{c=int(p/100*n+0.5); if(c>n)c=n; if(c<0)c=0; print c}')
@@ -37,7 +37,7 @@ if [ -n "$used_pct" ] && [ "$used_pct" != "null" ]; then
   done
   ctx_cells_display=$(printf '\033[%sm%s\033[0m' "$cell_color" "$cells")
 else
-  ctx_display='ctx n/a'
+  ctx_display='💭 n/a'
   ctx_cells_display=''
 fi
 
