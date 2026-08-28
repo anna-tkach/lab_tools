@@ -5,6 +5,11 @@ input=$(cat)
 cwd=$(printf '%s' "$input" | jq -r '.workspace.current_dir // .cwd // empty')
 dir_display="${cwd/#$HOME/~}"
 
+branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+if [ -n "$branch" ]; then
+  dir_display="$dir_display ($branch)"
+fi
+
 model_name=$(printf '%s' "$input" | jq -r '.model.display_name // empty')
 model_id=$(printf '%s' "$input" | jq -r '.model.id // empty')
 if [ -n "$model_id" ] && [ "$model_id" != "null" ]; then
