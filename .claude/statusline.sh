@@ -32,9 +32,9 @@ fi
 
 if [ -n "$used_pct" ] && [ "$used_pct" != "null" ]; then
   if [ -n "$max_tokens_display" ]; then
-    ctx_display=$(printf '💭 %.0f%% / %.0f%% (%s)' "$remaining_pct" "$used_pct" "$max_tokens_display")
+    ctx_display=$(printf '💭 %.0f%% / %.0f%% (%s)' "$used_pct" "$remaining_pct" "$max_tokens_display")
   else
-    ctx_display=$(printf '💭 %.0f%% / %.0f%%' "$remaining_pct" "$used_pct")
+    ctx_display=$(printf '💭 %.0f%% / %.0f%%' "$used_pct" "$remaining_pct")
   fi
 
   total_cells=10
