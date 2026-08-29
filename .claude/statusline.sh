@@ -61,7 +61,4 @@ else
   cost_display='💰 cost n/a'
 fi
 
-permission_mode=$(printf '%s' "$input" | jq -r '.permissionMode // "unknown"')
-permission_display="🔒 $permission_mode"
-
-printf '%s | %s | %s %s | %s | %s\n' "$dir_display" "$model_display" "$ctx_display" "$ctx_cells_display" "$cost_display" "$permission_display"
+printf '%s | %s | %s %s | %s\n' "$dir_display" "$model_display" "$ctx_display" "$ctx_cells_display" "$cost_display"
