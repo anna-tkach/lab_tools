@@ -13,10 +13,11 @@ fi
 
 model_name=$(printf '%s' "$input" | jq -r '.model.display_name // empty')
 model_id=$(printf '%s' "$input" | jq -r '.model.id // empty')
+effort=$(printf '%s' "$input" | jq -r '.effort.level // "unknown"')
 if [ -n "$model_id" ] && [ "$model_id" != "null" ]; then
-  model_display="🤖 $model_name ($model_id)"
+  model_display="🤖 $model_name ($model_id) [$effort]"
 else
-  model_display="🤖 $model_name"
+  model_display="🤖 $model_name [$effort]"
 fi
 
 used_pct=$(printf '%s' "$input" | jq -r '.context_window.used_percentage // empty')
