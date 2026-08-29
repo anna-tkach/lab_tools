@@ -89,3 +89,7 @@ fi
 # викликаємо знайдену реалізацію, передаючи їй profile, tests-файл і команду —
 # "${FINAL_COMMAND[@]}" розкриває масив як окремі аргументи (не один злитий рядок)
 "$IMPL_SCRIPT" "$PROFILE" "$TESTS_FILE" "${FINAL_COMMAND[@]}"
+
+
+# після виходу із sandbox-у - запропонуємо запушити
+echo "⚠️ [git push] if needed."
