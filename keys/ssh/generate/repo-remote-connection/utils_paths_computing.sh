@@ -25,3 +25,26 @@ compute_git_instruction_file_absolute_path() {
 
   echo "${REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH}/${SSH_GIT_CONNECT_INSTRUCTION_FILE_NAME}"
 }
+
+# Обернена операція до compute_git_instruction_file_absolute_path() -
+# відновлює шлях до теки інструкцій за абсолютним шляхом до файлу git-інструкції,
+# прибираючи з кінця відомий суфікс (назву файлу), а не покладаючись на "dirname"
+# (dirname просто відрізає останній сегмент шляху, що виглядало б правильно навіть
+# якби форма шляху колись змінилась, і замаскувало б помилку - тут же явно
+# перевіряється, що шлях дійсно закінчується на очікуваний файл).
+#
+# Аргументи:
+#   1) REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH - абсолютний шлях до файлу git-інструкції
+#
+# Друкує (echo) один рядок - абсолютний шлях до теки інструкцій, що містить цей файл.
+extract_instructions_folder_absolute_path_from_git_instruction_file_absolute_path() {
+  REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH="$1"
+
+  local expected_suffix="/${SSH_GIT_CONNECT_INSTRUCTION_FILE_NAME}"
+  if [[ "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH" != *"$expected_suffix" ]]; then
+    echo "Помилка: '$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH' не закінчується на '$expected_suffix'" >&2
+    exit 1
+  fi
+
+  echo "${REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH%$expected_suffix}"
+}
