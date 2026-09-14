@@ -25,5 +25,10 @@ LAB_ROOT_DIRECTORY_BRANCH_RUNNERS=runners
 # Всі гілки зібрані в 1 масив.
 LAB_ROOT_DIRECTORY_BRANCHES=($LAB_ROOT_DIRECTORY_BRANCH_REPO $LAB_ROOT_DIRECTORY_BRANCH_VAULT $LAB_ROOT_DIRECTORY_BRANCH_RUNNERS)
 
+# Назва теки всередині кожного репозиторію (в гілці repo), де лежать файли-інструкції
+# для людини (наприклад, як підключити ssh ключ до git remote). Ця тека повністю
+# заборонена всередині sandbox раннера, бо вона не призначена для агента.
+REPO_INSTRUCTIONS_FOLDER_NAME=".instructions"
+
 # Take all PATHS from .env to build sandbox paths
 REPO_RUNNER_VAR_PATH="${PATH_PYTHON3}:${PATH_RUBY}:${PATH_LOCAL_BIN}:${PATH_NVM_NODE_BIN}:${PATH_HOMEBREW_BIN}:${PATH_HOMEBREW_SBIN}:/usr/bin:/bin"

@@ -8,6 +8,8 @@
 # {{USER_LAB_ABSOLUTE_PATH}}
 # {{TEXT_FILE_IN_USER_LAB_ABSOLUTE_PATH}}
 # {{REPO_ABSOLUTE_PATH}}
+# {{REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH}}
+# {{REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH}}
 # в момент копіювання цього темплейту в runners/.
 # {{TEMPLATE_VARS_DESCRIPTION}}
 
@@ -31,5 +33,6 @@
 # Дозвіл до репозиторію
 Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && /bin/ls|allow
 Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && ls|allow
-Доступ до .git-instructions.md заборонено|cat {{GIT_INSTRUCTION_FILE_ABSOLUTE_PATH}}|deny
+Перелік теки .instructions заборонено|ls {{REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH}}|deny
+Доступ до файлу git-інструкції заборонено|cat {{REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH}}|deny
 

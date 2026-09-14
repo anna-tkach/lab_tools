@@ -7,14 +7,14 @@
 # Кожен метод сам вирішує, які файли раннера йому потрібні і як їх створити.
 #
 # Використання:
-#   sh new-repo-create.sh <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL>
+#   sh new-repo-create.sh <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL> <REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH>
 
 # зупиняє виконання скрипта одразу, якщо будь-яка команда в ньому впаде
 # з помилкою — без цього bash за замовчуванням ігнорує помилку і йде далі
 set -euo pipefail
 
-if [ "$#" -ne 4 ]; then
-  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL>"
+if [ "$#" -ne 5 ]; then
+  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL> <REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH>"
   exit 1
 fi
 
@@ -22,6 +22,7 @@ REPO_ABSOLUTE_PATH="$1"
 RUNNER_ABSOLUTE_PATH="$2"
 USER_NAME="$3"
 USER_EMAIL="$4"
+REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH="$5"
 
 # "$(dirname "$0")" — тека, де лежить сам new-repo-create.sh, тобто env-runner/
 SCRIPT_DIR="$(dirname "$0")"
@@ -42,6 +43,6 @@ for METHOD in "${ENV_RUNNER_METHODS[@]}"; do
 
   # 2. Створюємо раннер
   echo "Створюю раннер методу '$METHOD' для репозиторію '$REPO_ABSOLUTE_PATH'..."
-  "$IMPL_SCRIPT" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$USER_NAME" "$USER_EMAIL"
+  "$IMPL_SCRIPT" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$USER_NAME" "$USER_EMAIL" "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"
 
 done

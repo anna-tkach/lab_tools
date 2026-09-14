@@ -133,7 +133,10 @@
 (allow file-read* (subpath "{{REPO_ABSOLUTE_PATH}}"))
 (allow file-write* (subpath "{{REPO_ABSOLUTE_PATH}}"))
 ;; Exceptions
-(deny file-read* file-write* (literal {{GIT_INSTRUCTION_FILE_ABSOLUTE_PATH}}))
+;; .instructions/ - documentation for humans (e.g. how to connect ssh remote),
+;; not meant for the sandboxed agent. Deny the whole folder, not just one file,
+;; so any file placed here later is protected automatically.
+(deny file-read* file-write* (subpath "{{REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH}}"))
 
 ;; Allow to read-only some files inside of [runners] to make it work.
 (allow file-read* (literal "{{PERMISSION_CHECK_TESTS_ABSOLUTE_PATH}}"))

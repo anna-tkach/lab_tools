@@ -9,15 +9,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Підключаємо константи
 source "${SCRIPT_DIR}/constants.sh"
+# константи рівня keys (спільні для всіх типів ключів)
 source "${SCRIPT_DIR}/../../../constants.sh"
 
-# Скрипт очікує чотири позиційні аргументи:
+# Скрипт очікує п'ять позиційних аргументів:
 # 1. alias репозиторію (це owner-project-repo)
 # 2. абсолютний шлях до репозиторію
 # 3. абсолютний шлях до vault
 # 4. email, який буде вписаний у коментар (-C) публічного SSH-ключа
-if [[ $# -ne 4 ]]; then
-  echo "Використання: $0 <REPO_ALIAS> <REPO_ABSOLUTE_PATH> <VAULT_ABSOLUTE_PATH> <EMAIL>" >&2
+# 5. абсолютний шлях до файлу git-інструкції (обчислюється в repo.sh, єдиному місці,
+#    яке знає про теку .instructions/), потрібен щоб підставити його в шаблон інструкції.
+if [[ $# -ne 5 ]]; then
+  echo "Використання: $0 <REPO_ALIAS> <REPO_ABSOLUTE_PATH> <VAULT_ABSOLUTE_PATH> <EMAIL> <REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH>" >&2
   exit 1
 fi
 
@@ -26,6 +29,7 @@ REPO_ALIAS="$1"
 REPO_ABSOLUTE_PATH="$2"
 VAULT_ABSOLUTE_PATH="$3"
 EMAIL="$4"
+REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH="$5"
 
 
 # Генеруємо шляхи - куди і які файли будуть генеруватися.
@@ -44,12 +48,16 @@ SSH_PUBLIC_KEY_ABSOLUTE_PATH="${SSH_KEYS_PATHS[2]}"
 
 
 ### Тепер треба згенерувати інструкцію, як використати ці ключі із доступом до віддаленого git
-### і покласти її в папку із репозиторієм.
+### і покласти її в теку інструкцій репозиторія (ця тека повністю заборонена в sandbox раннера).
+### Цей скрипт нічого не знає про назву чи розташування цієї теки - лише про готовий
+### абсолютний шлях до файлу інструкції, отриманий як вхідний параметр.
 
 INSTRUCTIONS_FILE_NAME=$SSH_GIT_CONNECT_INSTRUCTION_FILE_NAME
-# Шлях куди покласти цю інструкцію для репозиторія.
-INSTRUCTION_FILE_PATH_FROM_ROOT_REPO="$INSTRUCTIONS_FILE_NAME"
-INSTRUCTIONS_FILE_ABSOLUTE_PATH="${REPO_ABSOLUTE_PATH}/$INSTRUCTION_FILE_PATH_FROM_ROOT_REPO"
+# Тека, що містить файл інструкції, має існувати перед записом файлу в неї.
+mkdir -p "$(dirname "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH")"
+# Шлях куди покласти цю інструкцію відносно кореня репозиторія (для .git/info/exclude) -
+# просто прибираємо префікс кореня репозиторія з уже відомого абсолютного шляху.
+INSTRUCTION_FILE_PATH_FROM_ROOT_REPO="${REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH#${REPO_ABSOLUTE_PATH}/}"
 # Шлях до шаблона інструкції (тут в проекті).
 INSTRUCTIONS_TEMPLATE_FILE_ABSOLUTE_PATH="${SCRIPT_DIR}/templates/$INSTRUCTIONS_FILE_NAME"
 
@@ -62,7 +70,7 @@ sed \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_SSH_KEYS_ABSOLUTE_PATH|$SSH_KEYS_ABSOLUTE_PATH|g" \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_SSH_PRIVATE_KEY_ABSOLUTE_PATH|$SSH_PRIVATE_KEY_ABSOLUTE_PATH|g" \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_SSH_PUBLIC_KEY_ABSOLUTE_PATH|$SSH_PUBLIC_KEY_ABSOLUTE_PATH|g" \
-  -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_GIT_INSTRUCTION_FILE_PATH_FROM_ROOT_REPO|$INSTRUCTION_FILE_PATH_FROM_ROOT_REPO|g" \
-  -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH|$INSTRUCTIONS_FILE_ABSOLUTE_PATH|g" \
+  -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_REPO_GIT_INSTRUCTION_FILE_PATH_FROM_ROOT_REPO|$INSTRUCTION_FILE_PATH_FROM_ROOT_REPO|g" \
+  -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH|$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH|g" \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_EMAIL|$EMAIL|g" \
-  "$INSTRUCTIONS_TEMPLATE_FILE_ABSOLUTE_PATH" > "$INSTRUCTIONS_FILE_ABSOLUTE_PATH"
+  "$INSTRUCTIONS_TEMPLATE_FILE_ABSOLUTE_PATH" > "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"

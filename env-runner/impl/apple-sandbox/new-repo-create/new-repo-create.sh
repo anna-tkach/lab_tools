@@ -11,7 +11,7 @@
 # Копіює темплейти раннера для методу apple-sandbox (permissions-profile.sb, permissions.tests, run.sh) у теку
 #
 # Використання:
-#   sh new-repo-create.sh <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL>
+#   sh new-repo-create.sh <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL> <REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH>
 
 # зупинити скрипт одразу, якщо будь-яка команда впаде з помилкою
 set -euo pipefail
@@ -70,9 +70,9 @@ EOF
 }
 
 create_file_if_needed() {
-  # make sure we have 5 inputs
-  if [ "$#" -ne 5 ]; then
-    echo "Використання: $0 <RUNNER_ABSOLUTE_PATH> <REPO_ABSOLUTE_PATH> <REPO_RUNNER_VAR_HOME> <METHOD_NAME> <FILE_NAME>"
+  # make sure we have 6 inputs
+  if [ "$#" -ne 6 ]; then
+    echo "Використання: $0 <RUNNER_ABSOLUTE_PATH> <REPO_ABSOLUTE_PATH> <REPO_RUNNER_VAR_HOME> <METHOD_NAME> <FILE_NAME> <REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH>"
     exit 1
   fi
 
@@ -82,6 +82,7 @@ create_file_if_needed() {
   REPO_RUNNER_VAR_HOME="$3"
   METHOD_NAME="$4"
   FILE_NAME="$5"
+  REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH="$6"
 
   # build absolute path to all files inside runners for apple-sandbox env for the repo
   RUNNERS_METHOD_ABSOLUTE_PATH="$RUNNER_ABSOLUTE_PATH/$METHOD_NAME"
@@ -119,6 +120,10 @@ create_file_if_needed() {
   # Get mac os user id - it is needed to build tmp directory for Claude
   MAC_OS_USER_ID=$(id -u)
 
+  # Тека, що містить git-інструкцію (напр. .instructions/), заборонена в sandbox повністю (subpath),
+  # а не лише сам файл — це дозволяє захистити будь-які майбутні файли в цій теці.
+  REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH="$(dirname "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH")"
+
   ## 1) take template 2) replace vars with values and 3) put built content into creating file.
   sed \
     -e "/$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VARS_DESCRIPTION_SECTION_NAME/,/$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VARS_DESCRIPTION_SECTION_NAME/d" \
@@ -134,6 +139,8 @@ create_file_if_needed() {
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_RUNNER_VAR_PATH|$REPO_RUNNER_VAR_PATH|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_RUNNER_VAR_HOME|$REPO_RUNNER_VAR_HOME|g" \
     -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_MAC_OS_USER_ID|$MAC_OS_USER_ID|g" \
+    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH|$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH|g" \
+    -e "s|$ENV_RUNNER_METHOD_APPLE_SANDBOX_TEMPLATES_VAR_REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH|$REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH|g" \
     "$FILE_TEMPLATE_ABSOLUTE_PATH" > "$FILE_ABSOLUTE_PATH"
 
   # give to current user on machine access to execute this file
@@ -148,9 +155,9 @@ create_file_if_needed() {
 # з помилкою — без цього bash за замовчуванням ігнорує помилку і йде далі
 set -euo pipefail
 
-# make sure we have 2 inputs
-if [ "$#" -ne 4 ]; then
-  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL>"
+# make sure we have 5 inputs
+if [ "$#" -ne 5 ]; then
+  echo "Використання: $0 <REPO_ABSOLUTE_PATH> <RUNNER_ABSOLUTE_PATH> <USER_NAME> <USER_EMAIL> <REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH>"
   exit 1
 fi
 
@@ -159,6 +166,7 @@ REPO_ABSOLUTE_PATH="$1"
 RUNNER_ABSOLUTE_PATH="$2"
 USER_NAME="$3"
 USER_EMAIL="$4"
+REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH="$5"
 
 #declare other needed vars
 METHOD_NAME="$ENV_RUNNER_METHOD_APPLE_SANDBOX"
@@ -169,13 +177,11 @@ create_home_env "$HOME_FOLDER_ABSOLUT_PATH" "$USER_NAME" "$USER_EMAIL"
 
 ## create all files if needed
 # create permission profile file.
-create_file_if_needed "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$HOME_FOLDER_ABSOLUT_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_PROFILE_FILE_NAME"
+create_file_if_needed "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$HOME_FOLDER_ABSOLUT_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_PROFILE_FILE_NAME" "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"
 # create permission check file.
-create_file_if_needed "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$HOME_FOLDER_ABSOLUT_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_TESTS_FILE_NAME"
+create_file_if_needed "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$HOME_FOLDER_ABSOLUT_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_PERMISSION_CHECK_TESTS_FILE_NAME" "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"
 # create run.sh file for the repo.
-create_file_if_needed "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$HOME_FOLDER_ABSOLUT_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_RUNNER_FILE_NAME"
+create_file_if_needed "$RUNNER_ABSOLUTE_PATH" "$REPO_ABSOLUTE_PATH" "$HOME_FOLDER_ABSOLUT_PATH" "$METHOD_NAME" "$ENV_RUNNER_METHOD_APPLE_SANDBOX_RUNNER_FILE_NAME" "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"
 
 echo "Раннер (метод $METHOD_NAME) для репозиторію створено."
 echo ""
-
-

@@ -56,17 +56,24 @@ done
 echo "Крок 1️⃣  готово. Створено структуру."
 echo ""
 
+# підключаємо утиліту обчислення шляху до файлу git-інструкції
+# (сам файл створюється на кроці 3, але шлях до нього потрібен вже на кроці 2 для sandbox-профілю раннера).
+source "$TOOLS_DIR/keys/ssh/generate/repo-remote-connection/utils_paths_computing.sh"
+
 # 2. for repo create runner in /runners/ branch.
 REPO_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$LAB_ROOT_DIRECTORY_BRANCH_REPO")
 RUNNER_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS")
-"$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$LAB_GIT_USER_NAME" "$EMAIL"
+# Тільки top-level (repo.sh) знає назву теки .instructions/ - жоден інший модуль її не знає.
+REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH="$REPO_ABSOLUTE_PATH/$REPO_INSTRUCTIONS_FOLDER_NAME"
+REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH=$(compute_git_instruction_file_absolute_path "$REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH")
+"$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$LAB_GIT_USER_NAME" "$EMAIL" "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"
 echo "Крок️ 2️⃣  готово. Створено runner.sh (в .../runners/...)."
 echo ""
 
 # 3. for repo generate ssh-key for repo-remote-connection in /vault/ branch.
 VAULT_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$LAB_ROOT_DIRECTORY_BRANCH_VAULT")
 REPO_ALIAS="$OWNER-$PROJECT-$REPO"
-"$TOOLS_DIR/keys/ssh/generate/repo-remote-connection/ssh-key-repo-remote-connection-generate.sh" "$REPO_ALIAS" "$REPO_ABSOLUTE_PATH" "$VAULT_ABSOLUTE_PATH" "$EMAIL"
+"$TOOLS_DIR/keys/ssh/generate/repo-remote-connection/ssh-key-repo-remote-connection-generate.sh" "$REPO_ALIAS" "$REPO_ABSOLUTE_PATH" "$VAULT_ABSOLUTE_PATH" "$EMAIL" "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"
 echo "Крок 3️⃣  готово. Створено зашифрований shh ключ (в .../vault/...)."
 echo ""
 
