@@ -20,7 +20,7 @@
       "Read(**/.env.*)",
       "Edit(**/.env)",
       "Edit(**/.env.*)",
-      "Bash(git reset:*)",
+      "Bash(git reset:*)"
     ],
     "ask": [
       "Bash(git restore:*)",
