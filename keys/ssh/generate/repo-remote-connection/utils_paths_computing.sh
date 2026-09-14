@@ -20,13 +20,13 @@ source "${SCRIPT_DIR}/constants.sh"
 #   1) REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH - абсолютний шлях до теки інструкцій репозиторія
 #
 # Друкує (echo) один рядок - абсолютний шлях до файлу git-інструкції.
-compute_git_instruction_file_absolute_path() {
+compute_git_instruction_file_absolute_path_by_instructions_folder_absolute_path() {
   REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH="$1"
 
   echo "${REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH}/${SSH_GIT_CONNECT_INSTRUCTION_FILE_NAME}"
 }
 
-# Обернена операція до compute_git_instruction_file_absolute_path() -
+# Обернена операція до compute_git_instruction_file_absolute_path_by_instructions_folder_absolute_path() -
 # відновлює шлях до теки інструкцій за абсолютним шляхом до файлу git-інструкції,
 # прибираючи з кінця відомий суфікс (назву файлу), а не покладаючись на "dirname"
 # (dirname просто відрізає останній сегмент шляху, що виглядало б правильно навіть
@@ -37,7 +37,7 @@ compute_git_instruction_file_absolute_path() {
 #   1) REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH - абсолютний шлях до файлу git-інструкції
 #
 # Друкує (echo) один рядок - абсолютний шлях до теки інструкцій, що містить цей файл.
-extract_instructions_folder_absolute_path_from_git_instruction_file_absolute_path() {
+compute_instructions_folder_absolute_path_by_git_instruction_file_absolute_path() {
   REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH="$1"
 
   local expected_suffix="/${SSH_GIT_CONNECT_INSTRUCTION_FILE_NAME}"
