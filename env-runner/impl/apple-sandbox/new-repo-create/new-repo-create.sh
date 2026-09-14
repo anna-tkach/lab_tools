@@ -31,9 +31,7 @@ source "$SCRIPT_ABSOLUTE_PATH/../../../constants.sh"
 # because we need root lab directory.
 source "$SCRIPT_ABSOLUTE_PATH/../../../../constants.sh"
 
-# 4. include утиліту, яка вміє відновити шлях до теки інструкцій
-# за абсолютним шляхом до файлу git-інструкції (обернена операція
-# до compute_git_instruction_file_absolute_path_by_instructions_folder_absolute_path()).
+# 4. include утиліту для обчислення шляху до теки інструкцій за шляхом до файлу git-інструкції.
 source "$SCRIPT_ABSOLUTE_PATH/../../../../keys/ssh/generate/repo-remote-connection/utils_paths_computing.sh"
 
 # 3. Build extra paths
@@ -127,7 +125,7 @@ create_file_if_needed() {
 
   # Тека, що містить git-інструкцію (напр. .instructions/), заборонена в sandbox повністю (subpath),
   # а не лише сам файл — це дозволяє захистити будь-які майбутні файли в цій теці.
-  REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH=$(compute_instructions_folder_absolute_path_by_git_instruction_file_absolute_path "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH")
+  REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH=$(compute_instructions_folder_path_by_git_instruction_file_path "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH")
 
   ## 1) take template 2) replace vars with values and 3) put built content into creating file.
   sed \

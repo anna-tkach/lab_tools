@@ -34,6 +34,9 @@ REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH="$5"
 
 # Генеруємо шляхи - куди і які файли будуть генеруватися.
 source "${SCRIPT_DIR}/../utils_paths_computing.sh"
+# Підключаємо утиліти обчислення шляхів цього модуля (repo-remote-connection),
+# а не батьківського - файл з тією ж назвою вище належить іншому модулю.
+source "${SCRIPT_DIR}/utils_paths_computing.sh"
 SSH_KEYS_PATHS=()
 while IFS= read -r line; do
   [[ -n "$line" ]] && SSH_KEYS_PATHS+=("$line")
@@ -58,6 +61,11 @@ mkdir -p "$(dirname "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH")"
 # Шлях куди покласти цю інструкцію відносно кореня репозиторія (для .git/info/exclude) -
 # просто прибираємо префікс кореня репозиторія з уже відомого абсолютного шляху.
 INSTRUCTION_FILE_PATH_FROM_ROOT_REPO="${REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH#${REPO_ABSOLUTE_PATH}/}"
+# Шлях до теки інструкцій відносно кореня репозиторія (для .git/info/exclude) - виключаємо
+# всю теку, а не лише цей файл, щоб будь-які майбутні файли в ній теж ігнорувались git-ом.
+# Використовуємо ту саму функцію, що й для абсолютних шляхів: вона лише прибирає відомий
+# суфікс (назву файлу) від кінця рядка, тому однаково коректно працює і з відносним шляхом.
+INSTRUCTIONS_FOLDER_PATH_FROM_ROOT_REPO=$(compute_instructions_folder_path_by_git_instruction_file_path "$INSTRUCTION_FILE_PATH_FROM_ROOT_REPO")
 # Шлях до шаблона інструкції (тут в проекті).
 INSTRUCTIONS_TEMPLATE_FILE_ABSOLUTE_PATH="${SCRIPT_DIR}/templates/$INSTRUCTIONS_FILE_NAME"
 
@@ -72,5 +80,6 @@ sed \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_SSH_PUBLIC_KEY_ABSOLUTE_PATH|$SSH_PUBLIC_KEY_ABSOLUTE_PATH|g" \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_REPO_GIT_INSTRUCTION_FILE_PATH_FROM_ROOT_REPO|$INSTRUCTION_FILE_PATH_FROM_ROOT_REPO|g" \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH|$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH|g" \
+  -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_REPO_INSTRUCTIONS_FOLDER_PATH_FROM_ROOT_REPO|$INSTRUCTIONS_FOLDER_PATH_FROM_ROOT_REPO|g" \
   -e "s|$SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_EMAIL|$EMAIL|g" \
   "$INSTRUCTIONS_TEMPLATE_FILE_ABSOLUTE_PATH" > "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"

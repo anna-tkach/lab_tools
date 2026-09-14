@@ -65,7 +65,7 @@ REPO_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY"
 RUNNER_ABSOLUTE_PATH=$(compute_lab_repo_branch_absolute_path "$LAB_ROOT_DIRECTORY" "$REPO_SUBPATH" "$LAB_ROOT_DIRECTORY_BRANCH_RUNNERS")
 # Тільки top-level (repo.sh) знає назву теки .instructions/ - жоден інший модуль її не знає.
 REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH="$REPO_ABSOLUTE_PATH/$REPO_INSTRUCTIONS_FOLDER_NAME"
-REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH=$(compute_git_instruction_file_absolute_path_by_instructions_folder_absolute_path "$REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH")
+REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH=$(compute_git_instruction_file_path_by_instructions_folder_path "$REPO_INSTRUCTIONS_FOLDER_ABSOLUTE_PATH")
 "$TOOLS_DIR/env-runner/new-repo-create.sh" "$REPO_ABSOLUTE_PATH" "$RUNNER_ABSOLUTE_PATH" "$LAB_GIT_USER_NAME" "$EMAIL" "$REPO_GIT_INSTRUCTION_FILE_ABSOLUTE_PATH"
 echo "Крок️ 2️⃣  готово. Створено runner.sh (в .../runners/...)."
 echo ""
