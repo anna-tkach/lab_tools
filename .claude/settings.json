@@ -14,7 +14,7 @@
     "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/statusline.sh\""
   },
   "permissions": {
-    "defaultMode": "manual",
+    "defaultMode": "acceptEdits",
     "deny": [
       "Read(**/.env)",
       "Read(**/.env.*)",
