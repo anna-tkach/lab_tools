@@ -3,7 +3,7 @@
 
 
 # Це файл, який допомагає правильно підключити згенерований ssh ключ до репозиторію. Містить набір підказок команд.
-SSH_GIT_CONNECT_INSTRUCTION_FILE_NAME=".git-ssh-connection-instructions.md"
+SSH_GIT_CONNECT_INSTRUCTION_FILE_NAME="ssh-remote-connection.md"
 
 # Vars inside of templates to replace
 SSH_GIT_CONNECT_INSTRUCTION_TEMPLATES_VAR_REPO_ALIAS={{REPO_ALIAS}}
