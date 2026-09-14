@@ -12,6 +12,21 @@
   "statusLine": {
     "type": "command",
     "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/statusline.sh\""
+  },
+  "permissions": {
+    "defaultMode": "manual",
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Bash(git reset:*)",
+    ],
+    "ask": [
+      "Bash(git restore:*)",
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)"
+    ]
   }
 }
 
