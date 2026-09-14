@@ -9,6 +9,7 @@
 echo "PERMISSION SELF-CHECK - before started."
 
 TESTS_FILE="$1"
+echo "TESTS_FILE: $TESTS_FILE."
 FAILED=0
 
 # if mode == 0 -> we must check test hard

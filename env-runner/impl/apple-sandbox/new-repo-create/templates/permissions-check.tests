@@ -31,3 +31,5 @@
 # Дозвіл до репозиторію
 Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && /bin/ls|allow
 Доступ до репозиторію дозволено|cd {{REPO_ABSOLUTE_PATH}} && ls|allow
+Доступ до .git-instructions.md заборонено|cat {{GIT_INSTRUCTION_FILE_ABSOLUTE_PATH}}|deny
+
